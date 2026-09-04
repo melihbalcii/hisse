@@ -4,7 +4,8 @@ import { bildirimler, bildirimDetay } from './src/kap.mjs';
 import { fiyat, sma } from './src/fiyat.mjs';
 import { lynch, lynchCoklu, sinyal } from './src/lynch.mjs';
 import { sirketler } from './src/liste.mjs';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { gecmis, ozetle, enflasyon } from './src/gecmis.mjs';
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 
 import { onem, etiket } from './src/onem.mjs';
 const YILDIZ = n => '*'.repeat(n).padEnd(5);
@@ -39,6 +40,7 @@ const HELP = `bist — BIST / KAP takip araci
   bist fiyat THYAO GARAN     sadece fiyat
   bist lynch THYAO ASELS     Peter Lynch olcutleriyle puanla
   bist tarama                tum BIST'i tara, public/veri/tarama.json yaz
+  bist gecmis                "o zaman alsaydim?" simulasyonu (--adet N, varsayilan 120)
                              (--adet N sinirla, --es N es zamanlilik)
 
 Bayraklar:
@@ -169,6 +171,43 @@ try {
       mkdirSync('public/veri', { recursive: true });
       writeFileSync('public/veri/tarama.json', JSON.stringify(paket));
       console.error(`\nbitti: ${sonuc.length} hisse, ${((Date.now() - t0) / 1000 / 60).toFixed(1)} dk -> public/veri/tarama.json`);
+      break;
+    }
+    case 'gecmis': {
+      // Evren: mevcut taramadan piyasa degerine gore en buyuk N hisse
+      const tarama = JSON.parse(readFileSync('public/veri/tarama.json', 'utf8'));
+      const evren = tarama.hisseler
+        .filter(h => h.piyasaDegeri != null)
+        .sort((a, b2) => b2.piyasaDegeri - a.piyasaDegeri)
+        .slice(0, flags.adet ?? 120);
+      const es = flags.es ?? 8;
+      console.error(`${evren.length} hisse icin gecmis hesaplaniyor (es zamanlilik ${es})...`);
+
+      const enf = await enflasyon([30, 90, 180, 365]);
+      console.error(`  enflasyon olcutu: ${enf[365].tufe != null ? "TUFE" : "dolar"} (1 yil: %${(enf[365].tufe ?? enf[365].dolar)?.toFixed(1)})`);
+      const sonuc = []; let i = 0, bitti = 0;
+      const t0 = Date.now();
+      const isci = async () => {
+        while (i < evren.length) {
+          const h = evren[i++];
+          try { sonuc.push({ ...(await gecmis(h.kod)), ad: h.ad, piyasaDegeri: h.piyasaDegeri }); }
+          catch { /* gecmisi olmayan hisse atlanir */ }
+          if (++bitti % 20 === 0) {
+            const g = (Date.now() - t0) / 1000;
+            console.error(`  ${bitti}/${evren.length}  bulunan: ${sonuc.length}  kalan ~${Math.round((g / bitti) * (evren.length - bitti) / 60)} dk`);
+          }
+        }
+      };
+      await Promise.all(Array.from({ length: es }, isci));
+
+      const paket = { tarih: new Date().toISOString(), hisseler: sonuc, ozet: ozetle(sonuc), olcutler: enf };
+      mkdirSync('public/veri', { recursive: true });
+      writeFileSync('public/veri/gecmis.json', JSON.stringify(paket));
+      console.error(`\nbitti: ${sonuc.length} hisse, ${((Date.now() - t0) / 1000 / 60).toFixed(1)} dk -> public/veri/gecmis.json`);
+      for (const d of paket.ozet) {
+        console.error(`\n${d.donem} — nominal ort %${d.tumu?.toFixed(1)} | ölçütler: dolar %${enf[d.gun].dolar?.toFixed(1)} · altın %${enf[d.gun].altin?.toFixed(1)}${enf[d.gun].tufe!=null?` · TÜFE %${enf[d.gun].tufe.toFixed(1)}`:``}:`);
+        d.kovalar.forEach(k => console.error(`   ${k.ad.padEnd(12)} n=${String(k.adet).padStart(4)}  nominal ort %${k.ortalama?.toFixed(1) ?? '-'}  medyan %${k.medyan?.toFixed(1) ?? '-'}  (altına göre reel ort %${k.ortalama!=null?(((1+k.ortalama/100)/(1+enf[d.gun].altin/100)-1)*100).toFixed(1):'-'})`));
+      }
       break;
     }
     case 'fiyat': {

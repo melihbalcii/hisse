@@ -5,84 +5,106 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BIST · Lynch</title>
 <style>
-  :root{--bg:#f7f7f5;--kart:#fff;--metin:#1a1a1a;--soluk:#6b6b6b;--cizgi:#e3e3df;
-        --arti:#0f7b3f;--eksi:#c0392b;--notr:#8a8a8a;--vurgu:#1a4d8f;--secili:#eef3fa;--sari:#8a6d00}
+  :root{--bg:#f6f6f4;--kart:#fff;--metin:#191919;--soluk:#6b6b6b;--cizgi:#e4e4e0;
+        --arti:#0f7b3f;--eksi:#c0392b;--notr:#8a8a8a;--vurgu:#1a4d8f;--secili:#eef3fa;
+        --sari:#8a6d00;--sarizemin:#fff8e1}
   @media (prefers-color-scheme:dark){
-    :root{--bg:#141414;--kart:#1d1d1d;--metin:#e8e8e6;--soluk:#9a9a96;--cizgi:#2e2e2e;
-          --arti:#4ade80;--eksi:#f87171;--notr:#8a8a8a;--vurgu:#7aa7e0;--secili:#20293a;--sari:#e0b83a}}
+    :root{--bg:#131313;--kart:#1c1c1c;--metin:#e9e9e7;--soluk:#9b9b97;--cizgi:#2d2d2d;
+          --arti:#4ade80;--eksi:#f87171;--notr:#8a8a8a;--vurgu:#7aa7e0;--secili:#1f2836;
+          --sari:#e0b83a;--sarizemin:#2a2618}}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--metin);
-       font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-  .sar{max-width:1180px;margin:0 auto;padding:20px 14px 60px}
-  header{display:flex;flex-wrap:wrap;align-items:baseline;gap:11px;margin-bottom:14px}
+       font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  .sar{max-width:1200px;margin:0 auto;padding:20px 14px 70px}
+  header{display:flex;flex-wrap:wrap;align-items:baseline;gap:11px;margin-bottom:13px}
   h1{font-size:21px;margin:0;letter-spacing:-.02em}
   .ust-bilgi{color:var(--soluk);font-size:13px}
-  .kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:11px;padding:14px 16px;margin-bottom:16px}
-  h2{font-size:14px;margin:0 0 11px;font-weight:650}
+  .kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:12px;padding:15px 17px;margin-bottom:16px}
+  h2{font-size:14.5px;margin:0 0 12px;font-weight:650}
+  h3{font-size:13.5px;margin:20px 0 7px;font-weight:650}
 
-  .sekmeler{display:flex;gap:4px;border-bottom:1px solid var(--cizgi);margin-bottom:16px}
-  .sekmeler button{font:inherit;font-size:14px;font-weight:600;padding:9px 16px;border:none;
+  .sekmeler{display:flex;gap:2px;border-bottom:1px solid var(--cizgi);margin-bottom:16px;overflow-x:auto}
+  .sekmeler button{font:inherit;font-size:14px;font-weight:600;padding:9px 15px;border:none;white-space:nowrap;
                    background:none;color:var(--soluk);cursor:pointer;border-bottom:2px solid transparent}
   .sekmeler button.aktif{color:var(--vurgu);border-bottom-color:var(--vurgu)}
   .sayfa{display:none}.sayfa.aktif{display:block}
 
   .fiyatlar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-  .fkart{background:var(--kart);border:1px solid var(--cizgi);border-radius:10px;padding:7px 12px;min-width:104px}
+  .fkart{background:var(--kart);border:1px solid var(--cizgi);border-radius:10px;padding:7px 12px;min-width:102px}
   .fkod{font-weight:650;font-size:12.5px}
 
-  .hazir{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+  .hazir{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;align-items:center}
   .hazir button,.dugme{font:inherit;font-size:13px;padding:6px 13px;border:1px solid var(--cizgi);
                 border-radius:20px;background:var(--bg);color:var(--metin);cursor:pointer}
   .hazir button:hover,.dugme:hover{border-color:var(--vurgu)}
   .hazir button.aktif{background:var(--vurgu);border-color:var(--vurgu);color:#fff}
   .dugme.dolu{background:var(--vurgu);border-color:var(--vurgu);color:#fff}
+  .dugme.kucuk{padding:3px 10px;font-size:12px;border-radius:14px}
+  .dugme:disabled{opacity:.5;cursor:default}
 
-  .suzgec{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:9px}
+  .suzgec{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:9px}
   .alan label{display:block;font-size:11.5px;color:var(--soluk);margin-bottom:3px}
-  input,select{width:100%;font:inherit;font-size:13.5px;padding:6px 9px;
+  input,select{width:100%;font:inherit;font-size:13.5px;padding:7px 9px;
                border:1px solid var(--cizgi);border-radius:7px;background:var(--bg);color:var(--metin)}
   .sayac{margin:12px 0 8px;font-size:13px;color:var(--soluk)}
 
   .tablo-sar{overflow-x:auto;background:var(--kart);border:1px solid var(--cizgi);border-radius:11px}
-  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:860px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
   th{text-align:right;padding:9px;color:var(--soluk);font-weight:600;font-size:11.5px;
-     border-bottom:1px solid var(--cizgi);white-space:nowrap;cursor:pointer;user-select:none;
+     border-bottom:1px solid var(--cizgi);white-space:nowrap;user-select:none;
      position:sticky;top:0;background:var(--kart)}
-  th:hover{color:var(--vurgu)}
+  th[data-a]{cursor:pointer}th[data-a]:hover{color:var(--vurgu)}
   th:first-child,td:first-child,th.sol,td.sol{text-align:left}
-  td{padding:7px 9px;border-bottom:1px solid var(--cizgi);text-align:right;white-space:nowrap}
+  td{padding:8px 9px;border-bottom:1px solid var(--cizgi);text-align:right;white-space:nowrap}
   tbody tr[data-kod]{cursor:pointer}
   tbody tr[data-kod]:hover{background:var(--secili)}
   tr.acik{background:var(--secili)}
   .kod{font-weight:650}.ad{color:var(--soluk);font-size:12px}
-  .puan{font-weight:700}.kat{color:var(--soluk);font-size:12.5px}
-  .detay td{background:var(--bg);font-size:13px;padding:11px 16px;text-align:left}
-  .detay ul{margin:0 0 8px;padding-left:18px}
+  .puan{font-weight:750;font-size:14px}.kat{color:var(--soluk);font-size:12.5px}
+  .detay td{background:var(--bg);font-size:13px;padding:12px 16px;text-align:left}
+  .detay ul{margin:0 0 9px;padding-left:18px}
   .rozet{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:11px;border:1px solid currentColor}
-  .dipnot{color:var(--soluk);font-size:12px;margin-top:10px}
-  .bos{color:var(--soluk);padding:28px 0;text-align:center}
+  .dipnot{color:var(--soluk);font-size:12px;margin-top:11px;line-height:1.6}
+  .bos{color:var(--soluk);padding:30px 0;text-align:center}
 
-  .ozet{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}
-  .ozet div{background:var(--bg);border:1px solid var(--cizgi);border-radius:9px;padding:9px 14px;min-width:132px}
-  .ozet .et{font-size:11.5px;color:var(--soluk)}
-  .ozet .dg{font-size:17px;font-weight:650}
-  .uyari{background:#fff3cd;color:#664d03;border:1px solid #ffe69c;padding:10px 13px;
-         border-radius:9px;margin-bottom:13px;font-size:13.5px}
-  @media (prefers-color-scheme:dark){.uyari{background:#3a3520;color:#f0dfa0;border-color:#5c5330}}
+  /* ---- portfoy ---- */
+  .pust{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:16px}
+  @media(max-width:760px){.pust{grid-template-columns:1fr}}
+  .buyukdeger{font-size:31px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+  .altdeger{font-size:15px;font-weight:650;margin-top:3px}
+  .et{font-size:11.5px;color:var(--soluk);text-transform:uppercase;letter-spacing:.04em}
+  .mini{display:flex;gap:18px;margin-top:13px;flex-wrap:wrap}
+  .mini>div{min-width:80px}
+  .mini .d{font-size:15px;font-weight:650;margin-top:1px}
+  .kiyas{display:flex;align-items:baseline;gap:9px;margin-top:9px;padding-top:11px;border-top:1px solid var(--cizgi)}
+  .cubuk{height:6px;border-radius:3px;background:var(--cizgi);overflow:hidden;margin-top:5px}
+  .cubuk i{display:block;height:100%;background:var(--vurgu)}
+  .islem-kutu{display:grid;grid-template-columns:1.3fr .9fr auto auto;gap:8px;align-items:end}
+  @media(max-width:620px){.islem-kutu{grid-template-columns:1fr 1fr}}
+  .maliyet{font-size:12.5px;color:var(--soluk);margin-top:8px;min-height:18px}
+  .uyari{background:var(--sarizemin);color:var(--sari);border:1px solid var(--cizgi);
+         padding:10px 13px;border-radius:9px;margin:11px 0;font-size:13.5px}
+
+  /* ---- egitim ---- */
+  .egitim{max-width:760px}
+  .egitim p{margin:9px 0}
+  .terim{border-left:3px solid var(--vurgu);padding:2px 0 2px 14px;margin:16px 0}
+  .terim b{font-size:15px}
+  .kutu{background:var(--bg);border:1px solid var(--cizgi);border-radius:9px;padding:11px 14px;margin:11px 0;font-size:13.5px}
+  .egitim table{font-size:13px;margin:9px 0}
+  .egitim th,.egitim td{border-bottom:1px solid var(--cizgi);padding:6px 9px}
+  code{background:var(--bg);border:1px solid var(--cizgi);border-radius:4px;padding:1px 5px;font-size:12.5px}
+
   .kayit{border-bottom:1px solid var(--cizgi);padding:10px 0}
   .kayit:last-child{border-bottom:none}
   .yildiz{color:var(--sari);font-size:11px;letter-spacing:1px}
   .saat{color:var(--soluk);font-size:12px;float:right}
   a{color:var(--vurgu)}
   @media (max-width:640px){
-    .sar{padding:14px 10px 50px}
-    h1{font-size:18px}
-    .suzgec{grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:7px}
-    .ozet div{min-width:calc(50% - 5px);flex:1}
-    .sekmeler button{padding:8px 11px;font-size:13px}
-    table{font-size:12.5px;min-width:700px}
-    th,td{padding:6px 7px}
-    .ad{display:none}          /* dar ekranda sirket adi yer kaplamasin */
+    .sar{padding:14px 10px 50px} h1{font-size:18px}
+    .suzgec{grid-template-columns:repeat(auto-fit,minmax(116px,1fr));gap:7px}
+    table{font-size:12.5px} th,td{padding:6px 7px} .ad{display:none}
+    .buyukdeger{font-size:26px}
   }
 </style>
 </head>
@@ -94,10 +116,12 @@
   <div class="sekmeler" id="sekmeler">
     <button data-s="tarama" class="aktif">Tarama</button>
     <button data-s="portfoy">Sanal portföy</button>
+    <button data-s="simulasyon">Geçmiş simülasyon</button>
     <button data-s="kap">KAP bildirimleri</button>
+    <button data-s="egitim">Nasıl okunur?</button>
   </div>
 
-  <!-- ============ TARAMA ============ -->
+  <!-- ═══════════ TARAMA ═══════════ -->
   <div class="sayfa aktif" id="s-tarama">
     <div class="kart">
       <div class="hazir" id="hazir">
@@ -124,40 +148,81 @@
       </div>
       <div class="sayac" id="sayac"></div>
       <div class="tablo-sar"><table id="tablo"></table></div>
-      <div class="dipnot">Mali tablolar TMS-29 uyarınca enflasyona göre düzeltilmiştir; ancak yıllar karşılaştırılırken her yıl kendi dönem sonu parasıyla alındığından bir yıllık enflasyon farkı kalır — büyüme oranları o kadar yukarı yanlıdır. <b>Bankalar ve finans kuruluşları taramada yoktur</b> (farklı mali tablo formatı; borç/özkaynak ölçütü onlarda anlamsızdır). Kırmızı hacim = günde 20 mn TL altı, likidite riski. <b>•</b> işaretli satırlar canlı fiyatla güncellenmiştir.<b>•</b> işaretli satırlar canlı fiyatla güncellenmiştir. Satıra tıklayınca puan dökümü ve alım düğmesi açılır.</div>
+      <div class="dipnot" id="taramaDipnot"></div>
     </div>
   </div>
 
-  <!-- ============ PORTFOY ============ -->
+  <!-- ═══════════ PORTFOY ═══════════ -->
   <div class="sayfa" id="s-portfoy">
-    <div class="kart">
-      <h2>Sanal portföy <span style="font-weight:400;color:var(--soluk)">— gerçek para yok, emir gönderilmez</span></h2>
-      <div class="ozet" id="pOzet"></div>
-      <div id="pUyari"></div>
-      <div class="suzgec" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr));margin-bottom:11px">
-        <div class="alan"><label>Hisse</label><input id="iKod" placeholder="THYAO"></div>
-        <div class="alan"><label>Adet</label><input id="iAdet" type="number" min="1" step="1" placeholder="100"></div>
-        <div class="alan"><label>&nbsp;</label><button class="dugme dolu" id="bAl" style="width:100%">Al</button></div>
-        <div class="alan"><label>&nbsp;</label><button class="dugme" id="bSat" style="width:100%">Sat</button></div>
+    <div class="pust">
+      <div class="kart" style="margin:0">
+        <div class="et">Portföy değeri</div>
+        <div class="buyukdeger" id="pDeger">–</div>
+        <div class="altdeger" id="pKar">–</div>
+        <div class="kiyas" id="pKiyas"></div>
+        <div class="mini" id="pMini"></div>
       </div>
+      <div class="kart" style="margin:0">
+        <div class="et">İşlem</div>
+        <div class="islem-kutu" style="margin-top:9px">
+          <div class="alan"><label>Hisse</label><input id="iKod" placeholder="THYAO" list="hisseListesi"></div>
+          <div class="alan"><label>Adet</label><input id="iAdet" type="number" min="1" step="1" placeholder="100"></div>
+          <button class="dugme dolu" id="bAl">Al</button>
+          <button class="dugme" id="bSat">Sat</button>
+        </div>
+        <datalist id="hisseListesi"></datalist>
+        <div class="maliyet" id="iMaliyet"></div>
+        <div id="pUyari"></div>
+      </div>
+    </div>
+
+    <div class="kart">
+      <h2>Pozisyonlar</h2>
       <div class="tablo-sar"><table id="pTablo"></table></div>
     </div>
 
     <div class="kart">
-      <h2>Nöbetçi — sinyal değişince Telegram'dan haber ver</h2>
-      <div class="suzgec" style="grid-template-columns:1fr auto auto;gap:8px">
-        <div class="alan"><label>İzleme listesi (virgülle, en çok 15)</label><input id="iIzleme" placeholder="THYAO,TUPRS,ENKAI"></div>
+      <h2>Nöbetçi <span style="font-weight:400;color:var(--soluk)">— sinyal değişince Telegram'a haber verir</span></h2>
+      <div class="suzgec" style="grid-template-columns:1fr auto auto">
+        <div class="alan"><label>İzleme listesi (virgülle, en çok 15)</label><input id="iIzleme"></div>
         <div class="alan"><label>&nbsp;</label><button class="dugme" id="bIzle">Kaydet</button></div>
         <div class="alan"><label>&nbsp;</label><button class="dugme" id="bNobet">Şimdi kontrol et</button></div>
       </div>
       <div id="nobetSonuc" class="dipnot"></div>
-      <div class="dipnot">Portföyündeki hisseler otomatik izlenir. Kontrol seans içinde 30 dakikada bir kendiliğinden çalışır.</div>
+      <div class="dipnot">Portföyündeki hisseler otomatik izlenir. Hafta içi seans boyunca 30 dakikada bir kendiliğinden kontrol edilir.</div>
     </div>
 
     <div class="kart"><h2>İşlem geçmişi</h2><div class="tablo-sar"><table id="pIslem"></table></div></div>
   </div>
 
-  <!-- ============ KAP ============ -->
+  <!-- ═══════════ SIMULASYON ═══════════ -->
+  <div class="sayfa" id="s-simulasyon">
+    <div class="kart">
+      <h2>O zaman alsaydım ne olurdu?</h2>
+      <p style="font-size:13.5px;color:var(--soluk);margin:0 0 13px">
+        Geçmiş bir tarihteki Lynch puanları, <b>o gün bilinen bilançolarla</b> hesaplandı —
+        geleceğe bakılmadı. Yanındaki getiri, o günden bugüne fiyat değişimi.</p>
+      <div class="hazir" id="simDonem"></div>
+      <div class="hazir" style="margin-top:-4px">
+        <span style="font-size:12.5px;color:var(--soluk)">Neye göre reel?</span>
+        <span id="simOlcut"></span>
+      </div>
+      <h3>Puan aralığına göre ortalama getiri</h3>
+      <div class="tablo-sar"><table id="simOzet"></table></div>
+      <div class="dipnot" id="simYorum"></div>
+      <h3>Hisse bazında</h3>
+      <div class="suzgec" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:11px">
+        <div class="alan"><label>Ara</label><input id="simAra" placeholder="THYAO…"></div>
+        <div class="alan"><label>O zamanki sinyal</label><select id="simSinyal"><option value="">hepsi</option>
+          <option>AL</option><option>BEKLE</option><option>KAÇIN</option></select></div>
+        <div class="alan"><label>En az puan (o zaman)</label><input id="simPuan" type="number" step="1"></div>
+      </div>
+      <div class="sayac" id="simSayac"></div>
+      <div class="tablo-sar"><table id="simTablo"></table></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ KAP ═══════════ -->
   <div class="sayfa" id="s-kap">
     <div class="kart">
       <div class="suzgec" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:12px">
@@ -171,257 +236,121 @@
       <div id="bildirimler"><div class="bos">Yükleniyor…</div></div>
     </div>
   </div>
+
+  <!-- ═══════════ EGITIM ═══════════ -->
+  <div class="sayfa" id="s-egitim">
+    <div class="kart egitim">
+      <h2>Tablodaki her şey ne anlama geliyor?</h2>
+
+      <p>Bu sistem <b>Peter Lynch</b>'in ölçütlerini uyguluyor. Lynch, 1977–1990 arasında Fidelity
+      Magellan fonunu yönetti ve yılda ortalama %29 getiri sağladı. Yöntemi karmaşık değil:
+      <i>kâr eden, borcu az, büyüyen ve fiyatı bu büyümeye göre ucuz kalmış şirketleri bul.</i></p>
+
+      <div class="kutu"><b>Önemli:</b> Buradaki puan bir <b>kontrol listesi sayacı</b>, alım tavsiyesi değil.
+      "Kaç ölçütten geçti" der; "ne kadar değerli" ya da "al" demez. Lynch'in kendisi de bu sayıları
+      araştırmanın <b>başlangıcı</b> sayardı.</div>
+
+      <h3>Puan nasıl oluşuyor</h3>
+      <p>Beş ölçütün toplamı. Teorik aralık <b>−7 ile +8</b> arası.</p>
+      <table><thead><tr><th class="sol">Ölçüt</th><th>Katkı</th><th class="sol">Neden bu ağırlık</th></tr></thead><tbody>
+        <tr><td class="sol"><b>PEG</b></td><td>−2 … +3</td><td class="sol">Lynch'in merkezî ölçütü, en yüksek ağırlık</td></tr>
+        <tr><td class="sol"><b>Borç/Özkaynak</b></td><td>−2 … +2</td><td class="sol">Borçlu şirket kötü çeyreği atlatamaz</td></tr>
+        <tr><td class="sol"><b>Kâr büyümesi</b></td><td>−2 … +2</td><td class="sol">Aradığı şey büyüme — ama ölçülü olanı</td></tr>
+        <tr><td class="sol"><b>Net nakit</b></td><td>0 … +1</td><td class="sol">Nakit fazlası efektif F/K'yı düşürür</td></tr>
+        <tr><td class="sol"><b>Stok/satış</b></td><td>−1 … 0</td><td class="sol">Stok satıştan hızlı artıyorsa mal birikiyor</td></tr>
+      </tbody></table>
+      <p>Ne kadar seçici olduğunu görmek için: taranan hisselerin sadece <b>%3'ü</b> +6 ve üstü alıyor.
+      +3 ilk beşte bir, 0 ortanca civarı.</p>
+
+      <h3>Sütunlar</h3>
+
+      <div class="terim"><b>Fiyat</b><br>
+        Hissenin güncel fiyatı (Yahoo Finance, ~15 dakika gecikmeli). Tablodaki F/K ve PEG
+        tarama anındaki fiyatla hesaplanır; <b>“Canlı fiyatla güncelle”</b> düğmesiyle anlık fiyata
+        göre yeniden hesaplanabilir — güncellenenler <b>•</b> ile işaretlenir.</div>
+
+      <div class="terim"><b>F/K — Fiyat / Kazanç</b><br>
+        Şirketin piyasa değerinin yıllık net kârına oranı. <code>F/K = piyasa değeri ÷ son 12 ay net kâr</code><br>
+        "Bu şirketi bugünkü kârıyla kaç yılda amorti ederim" diye okunur. F/K 10 ise kabaca 10 yıl.
+        <b>Tek başına düşük F/K iyi demek değildir</b> — kârı düşen şirketin F/K'sı da düşük görünür.
+        Lynch'in kuralı: F/K'yı büyümeyle birlikte değerlendir.</div>
+
+      <div class="terim"><b>Büyüme</b><br>
+        Yıllık net kâr artışı (son iki tam yıl karşılaştırması). Lynch'in ideal aralığı <b>%20–25</b>.
+        Daha yükseği daha iyi değil: %50 üstü büyümeyi <i>sürdürülemez</i> sayar ve puanda ödüllendirilmez.
+        <b>%100 üstü büyüme</b> genelde geçen yılın çok kötü olduğunu gösterir — o hisse "toparlanma"
+        sayılır ve PEG uygulanmaz.</div>
+
+      <div class="terim"><b>PEG — Lynch'in imzası</b><br>
+        <code>PEG = F/K ÷ büyüme oranı</code><br>
+        Lynch'in kuralı: <i>"adil fiyatlı bir şirketin F/K'sı büyüme oranına eşittir"</i> — yani PEG = 1 adil.
+        <table style="margin-top:7px"><tbody>
+          <tr><td class="sol">1'in altı</td><td class="sol">ucuz — büyümesine göre az fiyatlanmış</td></tr>
+          <tr><td class="sol">0.5'in altı</td><td class="sol">çok ucuz, en yüksek puanı alır</td></tr>
+          <tr><td class="sol">2'nin üstü</td><td class="sol">pahalı</td></tr>
+          <tr><td class="sol">–</td><td class="sol">büyüme yok/negatif ya da taban güvenilmez, hesaplanmaz</td></tr>
+        </tbody></table></div>
+
+      <div class="terim"><b>Borç / Özkaynak</b><br>
+        Finansal borçların özkaynağa oranı. 0.25 altı çok düşük, 1'in üstü yüksek.
+        Lynch borçsuz şirketi tercih ederdi: <i>"borcu olmayan şirket iflas etmez."</i>
+        Kötü bir çeyrekte borçsuz şirket bekler, borçlu şirket varlık satmak zorunda kalır.</div>
+
+      <div class="terim"><b>ROE — Özkaynak kârlılığı</b><br>
+        <code>ROE = net kâr ÷ özkaynak</code>. Şirketin, sahiplerinin koyduğu sermayeyle ne kadar
+        kâr ürettiği. Yüksek ROE verimli iş demek. Puana katılmaz, bilgi olarak gösterilir.</div>
+
+      <div class="terim"><b>Piyasa değeri</b><br>
+        Şirketin borsadaki toplam fiyatı: <code>hisse adedi × fiyat</code>. Milyar TL cinsinden.
+        Küçük şirketler daha hızlı büyüyebilir ama daha risklidir.</div>
+
+      <div class="terim"><b>Hacim (mn/gün)</b><br>
+        Son 20 günün ortalama günlük işlem tutarı, milyon TL. <b>Bu sütun puana girmez ama
+        hayati önemdedir.</b> Günde 10 milyon TL işlem gören bir hissede yüksek puan görmek
+        tuzak olabilir: almak ya da satmak istediğinde karşı taraf bulamazsın, fiyatı kendin
+        oynatırsın. <span style="color:var(--eksi)">Kırmızı</span> = günde 20 mn TL altı.</div>
+
+      <div class="terim"><b>Kategori — Lynch'in altı şirket tipi</b><br>
+        <table style="margin-top:7px"><tbody>
+          <tr><td class="sol"><b>yavaş büyüyen</b></td><td class="sol">%0–10 — olgun, temettü şirketi</td></tr>
+          <tr><td class="sol"><b>sağlam</b></td><td class="sol">%10–20 — Lynch'in "stalwart"ı, güvenli liman</td></tr>
+          <tr><td class="sol"><b>hızlı büyüyen</b></td><td class="sol">%20–50 — Lynch'in en sevdiği av alanı</td></tr>
+          <tr><td class="sol"><b>aşırı hızlı</b></td><td class="sol">%50+ — sürdürülebilirliği şüpheli</td></tr>
+          <tr><td class="sol"><b>toparlanma</b></td><td class="sol">kötü yıldan dönüş — ayrı kurallar gerekir</td></tr>
+          <tr><td class="sol"><b>zayıflayan</b></td><td class="sol">kâr düşüyor</td></tr>
+        </tbody></table></div>
+
+      <div class="terim"><b>Sinyal</b><br>
+        <table style="margin-top:7px"><tbody>
+          <tr><td class="sol"><b style="color:var(--arti)">AL</b></td><td class="sol">puan ≥ 4 <b>ve</b> PEG &lt; 1 <b>ve</b> borç/özkaynak &lt; 0.5</td></tr>
+          <tr><td class="sol"><b style="color:var(--sari)">BEKLE</b></td><td class="sol">arası</td></tr>
+          <tr><td class="sol"><b style="color:var(--eksi)">KAÇIN</b></td><td class="sol">puan ≤ −3</td></tr>
+        </tbody></table>
+        Nöbetçi, izlediğin hisselerde bu sinyal <b>değiştiğinde</b> Telegram'dan haber verir.</div>
+
+      <h3>Neyi göremez — dürüst sınırlar</h3>
+      <div class="kutu">
+        <p style="margin-top:0"><b>Bankalar ve finans kuruluşları listede yok.</b> Farklı mali tablo
+        formatı kullanıyorlar; ayrıca borç/özkaynak ölçütü bankada anlamsızdır (borç onların hammaddesi).</p>
+        <p><b>Enflasyon.</b> Mali tablolar TMS-29 uyarınca enflasyona göre düzeltiliyor. Ancak iki yıl
+        karşılaştırılırken her yıl kendi dönem sonu parasıyla alındığı için bir yıllık enflasyon farkı
+        kalır — büyüme oranları o kadar yukarı yanlıdır.</p>
+        <p><b>Tek seferlik kârlar.</b> Arsa satışından gelen kâr da "büyüme" sayılır.</p>
+        <p><b>Geçmişe bakar.</b> Tüm veri son açıklanan bilançodan gelir; gelecek çeyreği bilmez.</p>
+        <p style="margin-bottom:0"><b>Sektör körü.</b> Perakendeciyle sanayiciye aynı eşikler uygulanır.</p>
+      </div>
+
+      <h3>Nasıl kullanmalı</h3>
+      <p>Yüksek puan <b>"şuna bak"</b> demek, <b>"şunu al"</b> değil. Makul bir akış:</p>
+      <p>1. "Lynch: AL sinyali" süzgeciyle listeyi daralt (likidite filtresi de devrede olur)<br>
+         2. Satıra tıklayıp puanın nereden geldiğini oku — hangi ölçütten kaç puan almış?<br>
+         3. <b>Geçmiş simülasyon</b> sekmesinde aynı puanın geçmişte ne getirdiğine bak<br>
+         4. Şirketin ne iş yaptığını öğren — Lynch'in altın kuralı: <i>anlamadığın işe yatırım yapma</i><br>
+         5. Kararını verdiysen önce <b>sanal portföyde</b> dene</p>
+    </div>
+  </div>
 </div>
 
-<script>
-const $ = s => document.querySelector(s);
-const TAKIP = ['XU100','THYAO','GARAN','ASELS','TUPRS'];
-const esc = t => String(t ?? '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-const say = (v,n=1) => v == null ? '–' : v.toFixed(n);
-const yuzde = v => v == null ? '–' : '%' + v.toFixed(0);
-const mlr = v => v == null ? '–' : (v/1e9).toFixed(1);
-const para = v => v == null ? '–' : v.toLocaleString('tr',{maximumFractionDigits:0});
-const renk = p => p > 0 ? 'var(--arti)' : p < 0 ? 'var(--eksi)' : 'var(--notr)';
-const SINYAL_RENK = { AL:'var(--arti)', BEKLE:'var(--sari)', 'KAÇIN':'var(--eksi)' };
-
-let hisseler = [], sirala = { alan:'puan', ters:true }, acikSatir = null;
-const KUCUK_IYI = new Set(['fk','peg','borcOzkaynak']);
-const SUTUN = [['kod','Hisse','sol'],['sinyal','Sinyal','sol'],['puan','Puan',''],['fk','F/K',''],
-  ['buyume','Büyüme',''],['peg','PEG',''],['borcOzkaynak','Borç/Özk',''],['roe','ROE',''],
-  ['piyasaDegeri','Piy.Değ (mlr)',''],['hacim','Hacim (mn/gün)',''],['kategori','Kategori','sol']];
-const HAZIR = { al:{fSinyal:'AL',fHacim:20}, lynch:{fPeg:1,fBorc:0.5,fBuyume:10}, ucuz:{fPeg:0.7,fFk:15},
-                saglam:{fBorc:0.3,fBuyume:0}, buyuk:{fPd:50}, tumu:{} };
-const ALANLAR = ['fAra','fSinyal','fKat','fPuan','fFk','fPeg','fBorc','fBuyume','fPd','fHacim'];
-
-// ---------- sekmeler ----------
-$('#sekmeler').querySelectorAll('button').forEach(b => b.onclick = () => {
-  $('#sekmeler').querySelectorAll('button').forEach(x => x.classList.toggle('aktif', x === b));
-  document.querySelectorAll('.sayfa').forEach(p => p.classList.toggle('aktif', p.id === 's-' + b.dataset.s));
-  if (b.dataset.s === 'portfoy') portfoyYukle();
-});
-
-// ---------- tarama ----------
-function suzulmus() {
-  const g = k => $('#'+k).value.trim();
-  const n = k => parseFloat($('#'+k).value);
-  const ara = g('fAra').toLocaleUpperCase('tr'), sin = g('fSinyal'), kat = g('fKat');
-  const [puan,fk,peg,borc,buy,pd,hac] = ['fPuan','fFk','fPeg','fBorc','fBuyume','fPd','fHacim'].map(n);
-  return hisseler.filter(h => {
-    if (ara && !(h.kod.includes(ara) || (h.ad??'').toLocaleUpperCase('tr').includes(ara))) return false;
-    if (sin && h.sinyal !== sin) return false;
-    if (kat && h.kategori !== kat) return false;
-    if (!isNaN(puan) && h.puan < puan) return false;
-    // olcute sinir konduysa, degeri OLMAYAN hisse elenir
-    if (!isNaN(fk)   && !(h.fk != null && h.fk <= fk)) return false;
-    if (!isNaN(peg)  && !(h.peg != null && h.peg <= peg)) return false;
-    if (!isNaN(borc) && !(h.borcOzkaynak != null && h.borcOzkaynak <= borc)) return false;
-    if (!isNaN(buy)  && !(h.buyume != null && h.buyume >= buy)) return false;
-    if (!isNaN(pd)   && !(h.piyasaDegeri != null && h.piyasaDegeri/1e9 >= pd)) return false;
-    if (!isNaN(hac)  && !(h.hacim != null && h.hacim/1e6 >= hac)) return false;
-    return true;
-  }).sort((a,b) => {
-    const x = a[sirala.alan], y = b[sirala.alan];
-    if (x == null && y == null) return 0;
-    if (x == null) return 1; if (y == null) return -1;
-    const k = typeof x === 'string' ? x.localeCompare(y,'tr') : x - y;
-    return sirala.ters ? -k : k;
-  });
-}
-
-function ciz() {
-  const liste = suzulmus();
-  $('#sayac').textContent = `${liste.length} hisse gösteriliyor (${hisseler.length} taranmış içinden)`;
-  if (!liste.length) { $('#tablo').innerHTML = '<tbody><tr><td class="bos">Ölçütlere uyan hisse yok.</td></tr></tbody>'; return; }
-  const ok = a => sirala.alan === a ? (sirala.ters ? ' ↓' : ' ↑') : '';
-  $('#tablo').innerHTML =
-    '<thead><tr>' + SUTUN.map(([a,ad,c]) => `<th class="${c}" data-a="${a}">${ad}${ok(a)}</th>`).join('') + '</tr></thead><tbody>' +
-    liste.map(h => {
-      const d = acikSatir === h.kod ? `<tr class="detay"><td colspan="${SUTUN.length}">
-        <ul>${h.kalemler.map(([n,ad,ac]) => `<li><b style="color:${renk(n)}">${n>0?'+'+n:n}</b> ${esc(ad)} — ${esc(ac)}</li>`).join('')}</ul>
-        <div>Dönem ${esc(h.donem)} · fiyat ${h.fiyat} TL
-          <button class="dugme dolu" style="margin-left:10px" onclick="hizliAl('${h.kod}')">Sanal portföye al</button></div></td></tr>` : '';
-      return `<tr class="${acikSatir===h.kod?'acik':''}" data-kod="${h.kod}">
-        <td class="sol"><span class="kod">${esc(h.kod)}</span><br><span class="ad">${esc((h.ad??'').slice(0,28))}</span></td>
-        <td class="sol"><span class="rozet" style="color:${SINYAL_RENK[h.sinyal]??'var(--notr)'}">${esc(h.sinyal??'–')}</span></td>
-        <td class="puan" style="color:${renk(h.puan)}">${h.puan>0?'+':''}${h.puan}</td>
-        <td${h.canli?' title="canlı fiyattan" style="font-weight:650"':''}>${say(h.fk)}${h.canli?' •':''}</td><td>${yuzde(h.buyume)}</td><td>${say(h.peg,2)}</td>
-        <td>${say(h.borcOzkaynak,2)}</td><td>${yuzde(h.roe)}</td><td>${mlr(h.piyasaDegeri)}</td><td${h.hacim!=null&&h.hacim<20e6?' style="color:var(--eksi)" title="düşük işlem hacmi"':''}>${h.hacim==null?'–':(h.hacim/1e6).toFixed(0)}</td>
-        <td class="sol kat">${esc(h.kategori)}</td></tr>${d}`;
-    }).join('') + '</tbody>';
-  $('#tablo').querySelectorAll('th').forEach(th => th.onclick = () => {
-    const a = th.dataset.a;
-    const ilkYon = !(KUCUK_IYI.has(a) || a === 'kod' || a === 'kategori' || a === 'sinyal');
-    sirala = { alan:a, ters: sirala.alan === a ? !sirala.ters : ilkYon };
-    ciz();
-  });
-  $('#tablo').querySelectorAll('tbody tr[data-kod]').forEach(tr => tr.onclick = e => {
-    if (e.target.tagName === 'BUTTON') return;
-    acikSatir = acikSatir === tr.dataset.kod ? null : tr.dataset.kod; ciz();
-  });
-}
-
-// Temel veri (net kar, hisse adedi) ceyreklik degisir; fiyat 15 dk gecikmeli canli.
-// Ikisini birlestirip F/K ve PEG'i anlik fiyata gore YENIDEN hesaplariz.
-async function canliGuncelle() {
-  const b = $('#bCanli');
-  const liste = suzulmus().slice(0, 36).filter(h => h.hisseAdedi && h.ttmKar > 0);
-  if (!liste.length) { b.textContent = 'güncellenecek satır yok'; return; }
-  b.disabled = true; b.textContent = 'güncelleniyor…';
-  try {
-    // /api/fiyat istek basina en cok 12 kod alir
-    const parcalar = [];
-    for (let i = 0; i < liste.length; i += 12) parcalar.push(liste.slice(i, i + 12));
-    const cevaplar = await Promise.all(parcalar.map(p =>
-      fetch(`/api/fiyat?kod=${p.map(x => x.kod).join(',')}`).then(r => r.json())));
-    const fiyatMap = new Map(cevaplar.flat().filter(f => !f.hata).map(f => [f.kod, f.fiyat]));
-
-    let n = 0;
-    for (const h of liste) {
-      const yeni = fiyatMap.get(h.kod);
-      if (yeni == null || yeni <= 0) continue;
-      h.fiyat = yeni;
-      h.piyasaDegeri = h.hisseAdedi * yeni;
-      h.fk = h.piyasaDegeri / h.ttmKar;
-      h.peg = (h.tabanSaglam && h.buyume > 0) ? h.fk / h.buyume : null;
-      h.canli = true;
-      n++;
-    }
-    ciz();
-    b.textContent = `${n} satır canlı fiyatla güncellendi`;
-  } catch { b.textContent = 'güncellenemedi'; }
-  finally { b.disabled = false; setTimeout(() => b.textContent = 'Canlı fiyatla güncelle', 4000); }
-}
-$('#bCanli').onclick = canliGuncelle;
-
-window.hizliAl = kod => {
-  $('#iKod').value = kod;
-  $('#sekmeler').querySelector('[data-s="portfoy"]').click();
-  $('#iAdet').focus();
-};
-
-function hazirUygula(ad) {
-  ALANLAR.forEach(k => $('#'+k).value = '');
-  for (const [k,v] of Object.entries(HAZIR[ad] ?? {})) $('#'+k).value = v;
-  $('#hazir').querySelectorAll('button[data-h]').forEach(b => b.classList.toggle('aktif', b.dataset.h === ad));
-  ciz();
-}
-
-async function taramaYukle() {
-  try {
-    const d = await (await fetch('/veri/tarama.json')).json();
-    hisseler = d.hisseler;
-    $('#ustBilgi').textContent = `${d.hisseler.length} hisse · tarama ${new Date(d.tarih).toLocaleString('tr')}`;
-    $('#fKat').innerHTML = '<option value="">hepsi</option>' +
-      [...new Set(hisseler.map(h => h.kategori))].sort().map(k => `<option>${esc(k)}</option>`).join('');
-    ciz();
-  } catch {
-    $('#tablo').innerHTML = '<tbody><tr><td class="bos">Tarama verisi yok. <code>./bist.mjs tarama</code> çalıştırın.</td></tr></tbody>';
-  }
-}
-
-// ---------- portfoy ----------
-function portfoyCiz(p) {
-  const k = p.karYuzde;
-  $('#pOzet').innerHTML = `
-    <div><div class="et">Toplam değer</div><div class="dg">${para(p.toplam)} ₺</div></div>
-    <div><div class="et">Kâr / zarar</div><div class="dg" style="color:${renk(p.kar)}">
-      ${p.kar>0?'+':''}${para(p.kar)} ₺<span style="font-size:13px"> (${k>0?'+':''}${k.toFixed(2)}%)</span></div></div>
-    <div><div class="et">Nakit</div><div class="dg">${para(p.nakit)} ₺</div></div>
-    <div><div class="et">Hisse değeri</div><div class="dg">${para(p.hisseDegeri)} ₺</div></div>
-    <div><div class="et">Gün</div><div class="dg">${p.gun}</div></div>
-    ${p.endeks ? `<div><div class="et">XU100 (aynı dönem)</div>
-      <div class="dg" style="color:${renk(p.endeks.getiriYuzde)}">${p.endeks.getiriYuzde>0?"+":""}${p.endeks.getiriYuzde.toFixed(2)}%</div></div>
-    <div><div class="et">Endekse göre</div>
-      <div class="dg" style="color:${renk(k-p.endeks.getiriYuzde)}">${(k-p.endeks.getiriYuzde)>0?"+":""}${(k-p.endeks.getiriYuzde).toFixed(2)} puan</div></div>` : ""}`;
-
-  $('#pTablo').innerHTML = p.pozisyonlar.length
-    ? '<thead><tr><th class="sol">Hisse</th><th>Adet</th><th>Ort.maliyet</th><th>Fiyat</th><th>Günlük</th><th>Değer</th><th>K/Z</th><th>K/Z %</th></tr></thead><tbody>' +
-      p.pozisyonlar.map(s => `<tr><td class="sol kod">${esc(s.kod)}</td><td>${s.adet}</td>
-        <td>${say(s.ortMaliyet,2)}</td><td>${say(s.fiyat,2)}</td>
-        <td style="color:${renk(s.gunlukDegisim)}">${s.gunlukDegisim==null?'–':(s.gunlukDegisim>0?'+':'')+s.gunlukDegisim.toFixed(2)+'%'}</td>
-        <td>${para(s.deger)}</td>
-        <td style="color:${renk(s.kar)}">${s.kar==null?'–':(s.kar>0?'+':'')+para(s.kar)}</td>
-        <td style="color:${renk(s.kar)}">${s.karYuzde==null?'–':(s.karYuzde>0?'+':'')+s.karYuzde.toFixed(1)+'%'}</td></tr>`).join('') + '</tbody>'
-    : '<tbody><tr><td class="bos">Henüz pozisyon yok. Yukarıdan hisse alabilirsin.</td></tr></tbody>';
-
-  $('#pIslem').innerHTML = p.islemler.length
-    ? '<thead><tr><th class="sol">Tarih</th><th class="sol">İşlem</th><th class="sol">Hisse</th><th>Adet</th><th>Fiyat</th><th>Tutar</th><th>K/Z</th></tr></thead><tbody>' +
-      p.islemler.map(i => `<tr><td class="sol">${new Date(i.tarih).toLocaleString('tr')}</td>
-        <td class="sol" style="color:${i.tip==='AL'?'var(--vurgu)':'var(--sari)'};font-weight:650">${i.tip}</td>
-        <td class="sol kod">${esc(i.kod)}</td><td>${i.adet}</td><td>${say(i.fiyat,2)}</td><td>${para(i.tutar)}</td>
-        <td style="color:${renk(i.kar)}">${i.kar==null?'–':(i.kar>0?'+':'')+para(i.kar)}</td></tr>`).join('') + '</tbody>'
-    : '<tbody><tr><td class="bos">İşlem yok.</td></tr></tbody>';
-
-  if (p.izleme) $('#iIzleme').value = p.izleme.join(',');
-}
-
-async function portfoyYukle() {
-  try { portfoyCiz(await (await fetch('/api/portfoy')).json()); }
-  catch { $('#pUyari').innerHTML = '<div class="uyari">Portföy okunamadı.</div>'; }
-}
-
-async function islem(tip) {
-  const kod = $('#iKod').value.trim().toUpperCase(), adet = $('#iAdet').value;
-  if (!kod || !adet) { $('#pUyari').innerHTML = '<div class="uyari">Hisse kodu ve adet gerekli.</div>'; return; }
-  $('#pUyari').innerHTML = '';
-  const r = await fetch('/api/portfoy', { method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ islem:tip, kod, adet:Number(adet) }) });
-  const d = await r.json();
-  if (d.hata) { $('#pUyari').innerHTML = `<div class="uyari">${esc(d.hata)}</div>`; return; }
-  $('#iAdet').value = '';
-  portfoyCiz(d);
-}
-
-$('#bAl').onclick = () => islem('al');
-$('#bSat').onclick = () => islem('sat');
-$('#bIzle').onclick = async () => {
-  const kodlar = $('#iIzleme').value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
-  const d = await (await fetch('/api/portfoy',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({islem:'izle',kodlar})})).json();
-  $('#nobetSonuc').textContent = `İzleme listesi kaydedildi: ${(d.izleme??[]).join(', ') || '(boş)'}`;
-};
-$('#bNobet').onclick = async () => {
-  $('#nobetSonuc').textContent = 'kontrol ediliyor…';
-  try {
-    const d = await (await fetch('/api/nobet')).json();
-    $('#nobetSonuc').textContent =
-      `${d.izlenen} hisse kontrol edildi · ${d.degisen} sinyal değişikliği` +
-      (d.degisen ? ' → ' + d.degisenler.map(x => `${x.kod} ${x.eski}→${x.yeni}`).join(', ') : '') +
-      ` · Telegram: ${d.telegram.gonderildi ? 'gönderildi' : d.telegram.sebep}`;
-  } catch { $('#nobetSonuc').textContent = 'kontrol başarısız'; }
-};
-
-// ---------- fiyat + KAP ----------
-async function fiyatlariYukle() {
-  try {
-    const r = await (await fetch(`/api/fiyat?kod=${TAKIP.join(',')}`)).json();
-    $('#fiyatlar').innerHTML = r.filter(f => !f.hata).map(f => {
-      const d = f.degisimYuzde ?? 0;
-      return `<div class="fkart"><div class="fkod">${esc(f.kod)}</div><div>${f.fiyat?.toLocaleString('tr')}</div>
-        <div style="font-size:12px;color:${d>=0?'var(--arti)':'var(--eksi)'}">${d>=0?'+':''}${d.toFixed(2)}%</div></div>`;
-    }).join('');
-  } catch {}
-}
-
-async function bildirimleriYukle() {
-  $('#bildirimler').innerHTML = '<div class="bos">Yükleniyor…</div>';
-  try {
-    const d = await (await fetch(`/api/bildirimler?gunler=${$('#gunler').value}&min=${$('#min').value}`)).json();
-    $('#bildirimler').innerHTML = d.kayitlar.length ? d.kayitlar.map(k => `<div class="kayit">
-      <span class="yildiz">${'★'.repeat(k.onem)}</span> <b>${esc(k.etiket)}</b>
-      <span class="saat">${esc(k.tarih)}</span>
-      <div style="font-size:13.5px">${esc(k.baslik)}</div>
-      <div style="font-size:12px;margin-top:4px"><a href="${k.url}" target="_blank" rel="noopener">KAP'ta aç</a></div>
-    </div>`).join('') : '<div class="bos">Bu aralıkta bildirim yok.</div>';
-  } catch { $('#bildirimler').innerHTML = '<div class="bos">Bildirimler alınamadı.</div>'; }
-}
-
-$('#hazir').querySelectorAll('button[data-h]').forEach(b => b.onclick = () => hazirUygula(b.dataset.h));
-ALANLAR.forEach(k => $('#'+k).oninput = ciz);
-$('#gunler').onchange = bildirimleriYukle;
-$('#min').onchange = bildirimleriYukle;
-
-taramaYukle(); fiyatlariYukle(); bildirimleriYukle();
-</script>
+<script src="/app.js"></script>
 </body>
 </html>

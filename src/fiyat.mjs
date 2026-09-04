@@ -3,7 +3,8 @@ const CHART = s => `https://query1.finance.yahoo.com/v8/finance/chart/${s}`;
 const UA = { 'User-Agent': 'Mozilla/5.0' };
 
 /** BIST sembolunu Yahoo bicimine cevirir: THYAO -> THYAO.IS */
-export const sembol = k => (k.includes('.') ? k : `${k.toUpperCase()}.IS`);
+// BIST kodlarina .IS eklenir; doviz (USDTRY=X) ve endeks (^GSPC) sembolleri oldugu gibi gecer
+export const sembol = k => (/[.=^]/.test(k) ? k : `${k.toUpperCase()}.IS`);
 
 /** Gunluk/dakikalik mum verisi + anlik ozet. */
 export async function fiyat(kod, { range = '1mo', interval = '1d' } = {}) {

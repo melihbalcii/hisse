@@ -8,7 +8,7 @@ import { fiyat } from './fiyat.mjs';
  * degil AYRI bir kategori (turnaround) sayar ve ona PEG uygulamaz.
  * Sifira yakin tabandan cikan %1400 gibi oranlar aritmetik olarak dogru, analitik olarak anlamsizdir.
  */
-const tabanSaglam = (yeni, eski) => {
+export const tabanSaglam = (yeni, eski) => {
   if (eski == null || eski <= 0 || yeni == null) return false;
   const buyume = (yeni / eski - 1) * 100;
   // %100'un ustundeki buyume taban yilin cok dusuk oldugunu gosterir (kar en az ikiye katlanmis).
@@ -16,11 +16,11 @@ const tabanSaglam = (yeni, eski) => {
   return buyume <= 100;
 };
 
-const yuzdeDegisim = (yeni, eski) =>
+export const yuzdeDegisim = (yeni, eski) =>
   yeni == null || eski == null || eski === 0 ? null : (yeni / eski - 1) * 100;
 
 /** Lynch'in sirket siniflandirmasi — buyume hizina gore. */
-function kategori(buyume, saglam) {
+export function kategori(buyume, saglam) {
   if (buyume == null) return 'belirsiz';
   if (!saglam) return 'toparlanma';        // Lynch'in ayri kategorisi: turnaround
   if (buyume < 0) return 'zayıflayan';
@@ -31,7 +31,7 @@ function kategori(buyume, saglam) {
 }
 
 /** Her olcut icin puan ve gerekce — esikler Lynch'in kendi kurallari. */
-function puanla(m) {
+export function puanla(m) {
   const p = [];
 
   // 1. PEG — Lynch'in merkezi olcutu: "F/K, buyume oranina esitse adil fiyatlidir"
@@ -78,6 +78,33 @@ function puanla(m) {
 }
 
 /** Tek hisse icin tam degerlendirme. */
+
+/**
+ * Temel veri + fiyattan Lynch olcutlerini uretir.
+ * Hem guncel (lynch) hem gecmis (gecmis.mjs) hesaplamalari bunu kullanir.
+ */
+export function olcutler(t, fiyat, hacim = null) {
+  const piyasaDegeri = t.hisseAdedi && fiyat ? t.hisseAdedi * fiyat : null;
+  const fk = piyasaDegeri && t.ttmKar > 0 ? piyasaDegeri / t.ttmKar : null;
+  const buyume = yuzdeDegisim(t.fyKar.onceki, t.fyKar.oncekiOnceki);
+  const saglam = tabanSaglam(t.fyKar.onceki, t.fyKar.oncekiOnceki);
+
+  const m = {
+    kod: t.kod, donem: t.donem, fiyat, piyasaDegeri, fk, buyume, hacim,
+    ttmKar: t.ttmKar, hisseAdedi: t.hisseAdedi,
+    satisBuyume: yuzdeDegisim(t.fySatis.onceki, t.fySatis.oncekiOnceki),
+    tabanSaglam: saglam,
+    peg: fk != null && buyume > 0 && saglam ? fk / buyume : null,
+    borcOzkaynak: t.ozkaynak > 0 ? t.finansalBorc / t.ozkaynak : null,
+    netNakit: t.nakit != null ? t.nakit - t.finansalBorc : null,
+    roe: t.ozkaynak > 0 && t.ttmKar != null ? (t.ttmKar / t.ozkaynak) * 100 : null,
+    stokBuyume: yuzdeDegisim(t.stok, t.fyStok.onceki),
+  };
+  const kalemler = puanla(m);
+  return { ...m, kategori: kategori(buyume, saglam), kalemler,
+           puan: kalemler.reduce((a, [n]) => a + n, 0), enYuksek: 8 };
+}
+
 export async function lynch(kod) {
   const [t, f] = await Promise.all([temel(kod), fiyat(kod)]);
 
