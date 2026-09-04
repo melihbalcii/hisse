@@ -47,8 +47,8 @@ function enYakin(mumlar, hedefMs) {
  */
 export async function enflasyon(gunler) {
   const [kur, ons] = await Promise.all([
-    fiyat('USDTRY=X', { range: '2y', interval: '1d' }).catch(() => null),
-    fiyat('GC=F', { range: '2y', interval: '1d' }).catch(() => null),
+    fiyat('USDTRY=X', { range: '10y', interval: '1d' }).catch(() => null),
+    fiyat('GC=F', { range: '10y', interval: '1d' }).catch(() => null),
   ]);
   const gramSimdi = kur && ons ? (ons.fiyat / ONS_GRAM) * kur.fiyat : null;
 

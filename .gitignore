@@ -3,3 +3,7 @@ node_modules/
 .env
 deno.lock
 .DS_Store
+
+# calisma yedekleri ve eski algoritma verisi
+*.bak
+.eski/

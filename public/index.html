@@ -207,6 +207,10 @@
         <span style="font-size:12.5px;color:var(--soluk)">Neye göre reel?</span>
         <span id="simOlcut"></span>
       </div>
+      <div class="hazir" style="margin-top:-4px">
+        <span style="font-size:12.5px;color:var(--soluk)">Evren</span>
+        <span id="simLikit"></span>
+      </div>
       <h3>Puan aralığına göre ortalama getiri</h3>
       <div class="tablo-sar"><table id="simOzet"></table></div>
       <div class="dipnot" id="simYorum"></div>
@@ -276,7 +280,10 @@
         Lynch'in kuralı: F/K'yı büyümeyle birlikte değerlendir.</div>
 
       <div class="terim"><b>Büyüme</b><br>
-        Yıllık net kâr artışı (son iki tam yıl karşılaştırması). Lynch'in ideal aralığı <b>%20–25</b>.
+        <b>Son 12 ayın</b> net kârının, <b>önceki 12 aya</b> göre değişimi. Lynch'in ideal aralığı <b>%20–25</b>.
+        <br><span style="opacity:.85">Neden 12 ay: tam yıl karşılaştırması 20 aya kadar bayat kalabiliyor.
+        EREGL örneğinde tam yıl −%97 gösterirken gerçek son-12-ay değişimi −%17'ydi; aradaki fark
+        şirketin performansı değil, ölçümün gecikmesiydi.</span><br>
         Daha yükseği daha iyi değil: %50 üstü büyümeyi <i>sürdürülemez</i> sayar ve puanda ödüllendirilmez.
         <b>%100 üstü büyüme</b> genelde geçen yılın çok kötü olduğunu gösterir — o hisse "toparlanma"
         sayılır ve PEG uygulanmaz.</div>
@@ -288,8 +295,35 @@
           <tr><td class="sol">1'in altı</td><td class="sol">ucuz — büyümesine göre az fiyatlanmış</td></tr>
           <tr><td class="sol">0.5'in altı</td><td class="sol">çok ucuz, en yüksek puanı alır</td></tr>
           <tr><td class="sol">2'nin üstü</td><td class="sol">pahalı</td></tr>
-          <tr><td class="sol">–</td><td class="sol">büyüme yok/negatif ya da taban güvenilmez, hesaplanmaz</td></tr>
+          <tr><td class="sol">–</td><td class="sol">büyüme yok/negatif ya da taban güvenilmez — bunun yerine <b>PD/DD</b>'ye bakılır</td></tr>
         </tbody></table></div>
+
+      <div class="terim"><b>PD/DD — Piyasa değeri / Defter değeri</b><br>
+        Şirketin borsadaki fiyatının, muhasebe defterindeki özkaynağına oranı. <b>1'in altı</b>,
+        şirketi kâğıt üzerindeki net varlığından ucuza satın alabiliyorsun demek.<br>
+        <b>Neden var:</b> PEG yalnızca kârı büyüyen şirkette anlamlıdır. Kârı düşen ya da dipten
+        dönen şirkette PEG hesaplanamaz — Lynch böyle şirketleri <i>varlık değeri</i> üzerinden
+        değerlendirirdi. Tabloda PEG boşsa puanı PD/DD belirlemiştir.<br>
+        <span style="opacity:.85">Uyarı: ucuz PD/DD tek başına yetmez. Kâr etmeyen bir şirket
+        defterinin altında işlem görüyorsa piyasa o defter değerine inanmıyor olabilir.</span></div>
+
+      <div class="terim"><b>Eğilim — üç yıllık kâr izi</b><br>
+        Son üç 12 aylık dönemin kârı yan yana konur ve yön okunur:
+        <table style="margin-top:7px"><tbody>
+          <tr><td class="sol"><b>istikrarlı büyüme</b></td><td class="sol">üç dönemdir artıyor — Lynch'in aradığı süreklilik <b>(+1)</b></td></tr>
+          <tr><td class="sol"><b>toparlanıyor</b></td><td class="sol">düşmüştü, son dönemde döndü — Lynch'in turnaround'u <b>(+1)</b></td></tr>
+          <tr><td class="sol"><b>ivme kaybı</b></td><td class="sol">artıyordu, son dönemde yavaşladı <b>(0)</b></td></tr>
+          <tr><td class="sol"><b>dalgalı</b></td><td class="sol">yön yok <b>(0)</b></td></tr>
+          <tr><td class="sol"><b>istikrarlı daralma</b></td><td class="sol">üç dönemdir azalıyor <b>(−1)</b></td></tr>
+        </tbody></table>
+        Tek yıllık büyüme yanıltabilir; eğilim bunun süreklilik testidir.</div>
+
+      <div class="terim"><b>Net nakit</b><br>
+        Kasadaki para eksi finansal borç. Puan yalnızca net nakit <b>piyasa değerinin %20'sini
+        aştığında</b> verilir — çünkü Lynch nakti fiyattan düşerek "gerçek F/K"yı hesaplardı:
+        100 TL'ye aldığın şirketin 30 TL'si kasadaysa aslında 70 TL ödemişsindir.
+        <br><span style="opacity:.85">Küçük nakit ayrı puan almaz; borçsuzluk zaten
+        Borç/Özkaynak ölçütünde ödüllendirilir, iki kez sayılmaz.</span></div>
 
       <div class="terim"><b>Borç / Özkaynak</b><br>
         Finansal borçların özkaynağa oranı. 0.25 altı çok düşük, 1'in üstü yüksek.
@@ -317,12 +351,18 @@
           <tr><td class="sol"><b>hızlı büyüyen</b></td><td class="sol">%20–50 — Lynch'in en sevdiği av alanı</td></tr>
           <tr><td class="sol"><b>aşırı hızlı</b></td><td class="sol">%50+ — sürdürülebilirliği şüpheli</td></tr>
           <tr><td class="sol"><b>toparlanma</b></td><td class="sol">kötü yıldan dönüş — ayrı kurallar gerekir</td></tr>
-          <tr><td class="sol"><b>zayıflayan</b></td><td class="sol">kâr düşüyor</td></tr>
-        </tbody></table></div>
+          <tr><td class="sol"><b>zayıflayan</b></td><td class="sol">kâr düşüyor ama şirket hâlâ kârda</td></tr>
+          <tr><td class="sol"><b>zarara geçen</b></td><td class="sol">kârlıydı, son 12 ayda zarara döndü</td></tr>
+          <tr><td class="sol"><b>zararda</b></td><td class="sol">iki dönemdir zarar ediyor</td></tr>
+        </tbody></table>
+        <span style="opacity:.85">Son iki kategori, kâr negatife düştüğünde yüzde hesabının
+        anlamını yitirmesinden doğar: zarardan (−50) kâra (+100) geçen şirket aritmetik olarak
+        "−%300 büyüme" gösterir. Bu yüzden yüzde yerine <b>işaret değişimi</b> okunur —
+        zarardan kâra geçiş Lynch'in en değer verdiği sinyallerdendir.</span></div>
 
       <div class="terim"><b>Sinyal</b><br>
         <table style="margin-top:7px"><tbody>
-          <tr><td class="sol"><b style="color:var(--arti)">AL</b></td><td class="sol">puan ≥ 4 <b>ve</b> PEG &lt; 1 <b>ve</b> borç/özkaynak &lt; 0.5</td></tr>
+          <tr><td class="sol"><b style="color:var(--arti)">AL</b></td><td class="sol">puan ≥ 4 <b>ve</b> son 12 ay <b>kârlı</b> <b>ve</b> ucuz (PEG &lt; 1, PEG yoksa PD/DD &lt; 1) <b>ve</b> borç/özkaynak &lt; 0.5</td></tr>
           <tr><td class="sol"><b style="color:var(--sari)">BEKLE</b></td><td class="sol">arası</td></tr>
           <tr><td class="sol"><b style="color:var(--eksi)">KAÇIN</b></td><td class="sol">puan ≤ −3</td></tr>
         </tbody></table>

@@ -4,7 +4,7 @@ import { bildirimler, bildirimDetay } from './src/kap.mjs';
 import { fiyat, sma } from './src/fiyat.mjs';
 import { lynch, lynchCoklu, sinyal } from './src/lynch.mjs';
 import { sirketler } from './src/liste.mjs';
-import { gecmis, ozetle, enflasyon } from './src/gecmis.mjs';
+import { gecmis, ozetle, enflasyon, DONEMLER } from './src/gecmis.mjs';
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 
 import { onem, etiket } from './src/onem.mjs';
@@ -155,7 +155,7 @@ try {
           try {
             const r = await lynch(kod);
             // sinyal burada hesaplanir ki arayuz ile kural ayni yerden gelsin
-            if (r.fk != null || r.buyume != null) sonuc.push({ ...r, ad, sinyal: sinyal(r) });
+            if (r.fk != null || r.buyume != null || r.pd != null) sonuc.push({ ...r, ad, sinyal: sinyal(r) });
           } catch { /* mali tablosu olmayan (fon, VKS) atlanir */ }
           if (++bitti % 25 === 0) {
             const gecen = (Date.now() - t0) / 1000;
@@ -183,7 +183,7 @@ try {
       const es = flags.es ?? 8;
       console.error(`${evren.length} hisse icin gecmis hesaplaniyor (es zamanlilik ${es})...`);
 
-      const enf = await enflasyon([30, 90, 180, 365]);
+      const enf = await enflasyon(DONEMLER.map(d => d.gun));
       console.error(`  enflasyon olcutu: ${enf[365].tufe != null ? "TUFE" : "dolar"} (1 yil: %${(enf[365].tufe ?? enf[365].dolar)?.toFixed(1)})`);
       const sonuc = []; let i = 0, bitti = 0;
       const t0 = Date.now();
@@ -200,14 +200,23 @@ try {
       };
       await Promise.all(Array.from({ length: es }, isci));
 
-      const paket = { tarih: new Date().toISOString(), hisseler: sonuc, ozet: ozetle(sonuc), olcutler: enf };
+      const paket = { tarih: new Date().toISOString(), hisseler: sonuc, ozet: ozetle(sonuc), ozetLikit: ozetle(sonuc, 50e6), olcutler: enf };
       mkdirSync('public/veri', { recursive: true });
       writeFileSync('public/veri/gecmis.json', JSON.stringify(paket));
       console.error(`\nbitti: ${sonuc.length} hisse, ${((Date.now() - t0) / 1000 / 60).toFixed(1)} dk -> public/veri/gecmis.json`);
-      for (const d of paket.ozet) {
-        console.error(`\n${d.donem} — nominal ort %${d.tumu?.toFixed(1)} | ölçütler: dolar %${enf[d.gun].dolar?.toFixed(1)} · altın %${enf[d.gun].altin?.toFixed(1)}${enf[d.gun].tufe!=null?` · TÜFE %${enf[d.gun].tufe.toFixed(1)}`:``}:`);
-        d.kovalar.forEach(k => console.error(`   ${k.ad.padEnd(12)} n=${String(k.adet).padStart(4)}  nominal ort %${k.ortalama?.toFixed(1) ?? '-'}  medyan %${k.medyan?.toFixed(1) ?? '-'}  (altına göre reel ort %${k.ortalama!=null?(((1+k.ortalama/100)/(1+enf[d.gun].altin/100)-1)*100).toFixed(1):'-'})`));
-      }
+      const yaz = (baslik, ozet) => {
+        console.error(`\n${'='.repeat(66)}\n${baslik}\n${'='.repeat(66)}`);
+        for (const d of ozet) {
+          const o = enf[d.gun];
+          console.error(`\n${d.donem} (n=${d.adet}) — ölçütler: dolar %${o.dolar?.toFixed(0)} · altın %${o.altin?.toFixed(0)}${o.tufe!=null?` · TÜFE %${o.tufe.toFixed(0)}`:''}`);
+          for (const k of d.kovalar) {
+            const rm = k.medyan != null && o.altin != null ? ((1+k.medyan/100)/(1+o.altin/100)-1)*100 : null;
+            console.error(`   ${k.ad.padEnd(12)} n=${String(k.adet).padStart(4)}  medyan %${(k.medyan?.toFixed(0) ?? '-').padStart(6)}  ort %${(k.ortalama?.toFixed(0) ?? '-').padStart(6)}  → altına göre reel medyan %${(rm?.toFixed(0) ?? '-').padStart(5)}`);
+          }
+        }
+      };
+      yaz('TUM HISSELER', paket.ozet);
+      yaz('SADECE ISLEM GOREBILIR (gunluk >= 50 mn TL hacim)', ozetle(sonuc, 50e6));
       break;
     }
     case 'fiyat': {

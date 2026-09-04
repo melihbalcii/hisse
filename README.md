@@ -122,9 +122,57 @@ vermeyen kurumlar — bunlar sessizce atlanir.
 ./bist.mjs lynch THYAO ASELS TUPRS --detay
 ```
 
-Tamamen mekanik — LLM yok, yorum yok, NVIDIA kotasi harcamaz. Esikler Lynch'in
-kendi kurallari: PEG (merkezi olcut), borc/ozkaynak, buyume hizi (%20-25 ideal
-aralik), net nakit, ve stok/satis uyarisi.
+Tamamen mekanik — LLM yok, yorum yok, NVIDIA kotasi harcamaz. Alti olcut:
+degerleme (PEG ya da PD/DD), borc/ozkaynak, buyume hizi (%20-25 ideal aralik),
+uc yillik kar egilimi, net nakit, stok/satis uyarisi. En yuksek puan 9.
+
+### 5 Eylul 2026 revizyonu — olculen kusurlar ve duzeltmeleri
+
+Backtest, YUKSEK puanli kovanin DUSUK puanli kovadan daha kotu getirdigini
+gosterdi. Nedeni arastirildi; dordu de olcum hatasi cikti.
+
+**1. Buyume 20 aya kadar bayatti.** Buyume iki TAM YIL karsilastirmasindan
+geliyordu (2026 Eylul'unde 2025 ile 2024'u kiyasliyordu) — oysa TTM elde hazirdi.
+EREGL'de eski yontem -%97 gosteriyordu, gercek son-12-ay degisimi -%17'ydi.
+Duzeltme: ikinci bir istekle `[y-2,p]`, `[y-3,12]`, `[y-3,p]`, `[y-4,12]` cekilip
+uc ardisik 12 aylik pencere kuruldu; ucune de ayni formul uygulaniyor.
+Uc EN FAZLA 4 donem donduruyor (olculdu: 5. deger gelmiyor), o yuzden iki istek
+paralel atiliyor — zaman maliyeti yok, istek sayisi iki katina cikiyor.
+
+**2. Negatif tabana bolme.** `yuzdeDegisim` tabanin negatif olmasini
+denetlemiyordu. Zarardan (-50) kara (+100) gecen sirket "-%300 buyume"
+gosteriyordu — yani Lynch'in en degerli sinyali TERS ISARETLE giriyordu.
+Duzeltme: taban <= 0 iken yuzde uretilmiyor; bunun yerine `karDurumu()`
+isaret degisimini okuyor (`zarardan kara` +2, `kardan zarara` -2, `zararda` -2).
+Bu duzeltme piyasanin gercek halini acti: BIST'in %46'si (255/557 sirket)
+son 12 ayda zararda ya da zarara gecmis. Eski algoritma bunlarin yarisini
+anlamsiz bir `toparlanma` kovasina dolduruyordu (282 hisse).
+
+**3. Ayni bilgi iki kez cezalandiriliyordu.** Kar dususu hem PEG olcutunden
+(-2, "buyume yok/negatif") hem Buyume olcutunden (-2) puan kaybettiriyordu.
+Duzeltme: degerleme tek yuva oldu — PEG yalnizca buyuyen sirkette anlamli
+oldugu icin, buyumeyen/dipten donen sirkette yerini **PD/DD**'ye birakiyor
+(Lynch turnaround ve varlik oyunlarini defter degeri uzerinden degerlendirirdi).
+Ayni sekilde borcsuzluk hem Borc (+2) hem Nakit (+1) olcutunden puan aliyordu;
+Nakit artik yalnizca net nakit piyasa degerinin %20'sini asinca puan veriyor
+(Lynch'in "gercek F/K" hesabi: fiyattan nakti dus).
+
+**4. Toparlanma gorunmezdi.** Uc pencere elde olunca `egilim()` eklendi:
+istikrarli buyume / toparlaniyor / ivme kaybi / dalgali / istikrarli daralma.
+Dipten donus +1 aliyor — Lynch'in en cok deger verdigi kategori artik yakalaniyor.
+
+Ayrica **AL sinyali kar sartina baglandi**: defter degerinin altinda + borcsuz
+oldugu icin AL alan 9 ZARAR EDEN sirket vardi. Lynch zarar eden sirkete al demezdi.
+
+**Sonuc (ayni evren, ayni donem, eski vs yeni):** 3 ayda sira korelasyonu
+0.064 -> 0.191. 1 yilda yuksek/dusuk kova farki 4 puandan 13 puana cikti.
+Asil kazanim su: eski algoritmada dusuk puanli kova yuksek puanliyi yeniyordu,
+artik uc donemde de dogru sirada. BIMAS eski algoritmada -3 KACIN'di, yeni
+algoritmada +6 AL (PEG 0.35, toparlaniyor).
+
+**Durustluk notu:** korelasyonlar hala zayif (0.01-0.27). Istatistiksel olarak
+anlamli ayirt etme yalnizca **3 ve 4 yillik** vadelerde cikiyor (p<0.05) —
+ki bu Lynch'in kendi tutma vadesidir. Kisa vadede sistem yol gostermiyor.
 
 **Temel veri kaynagi** (Is Yatirim, anahtarsiz):
 
@@ -159,6 +207,28 @@ piyasa degeri ve F/K yanlis cikar.
 
 **Sinir:** buyume nominal TL uzerinden. Yuksek enflasyonda nominal buyume
 gercek buyumeyi abartir; Lynch'in esikleri dusuk enflasyonlu ABD icin yazilmistir.
+
+## Backtest'in durustluk kosullari
+
+`./bist.mjs gecmis --adet 300` — 8 donem (1 ay ... 5 yil), her tarih icin
+O GUN yayimlanmis bilancolarla puanlama (look-ahead bias yok).
+
+**Likidite filtresi sart.** Filtresiz calistirildiginda en cok kazandiran
+hisseler gunde birkac milyon TL islem goren mikro hisselerdi — o pozisyonlara
+gercekte girilemezdi. `ozetle(hisseler, 50e6)` gunluk 50 mn TL esigi uygular;
+arayuzde de varsayilan acik.
+
+**Ortalama degil medyan.** Tek bir %1385'lik hisse butun kovanin ortalamasini
+kaldiriyor. Kovalar medyanla karsilastirilmali.
+
+**Hayatta kalma yanliligi vadeyle buyur.** Evren BUGUN islem goren sirketlerden
+kuruluyor; o tarihte var olup sonradan borsadan cikan/batan sirketler yok.
+5 yillik sonuclar bu yuzden tum kovalarda iyimser.
+
+**Olcut secimi sonucu tersine cevirir.** 5 yilda BIST'in medyan hissesi dolara
+gore +%6, gram altina gore -%57. Ayni veri, iki farkli hukum. Gram altin
+5 yilda 480 TL'den 6.969 TL'ye cikti (+%1352): lira dolara karsi %83 deger
+kaybetti VE altin dolar bazinda %149 yukseldi — iki kuvvet carpildi.
 
 ## Fiyat verisi
 

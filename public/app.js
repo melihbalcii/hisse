@@ -19,10 +19,11 @@ $('#sekmeler').querySelectorAll('button').forEach(b => b.onclick = () => {
 
 /* ═════════ TARAMA ═════════ */
 let hisseler = [], sirala = { alan:'puan', ters:true }, acikSatir = null;
-const KUCUK_IYI = new Set(['fk','peg','borcOzkaynak']);
+const KUCUK_IYI = new Set(['fk','peg','pd','borcOzkaynak']);
 const SUTUN = [['kod','Hisse','sol'],['fiyat','Fiyat',''],['puan','Puan',''],['sinyal','Sinyal','sol'],
-  ['fk','F/K',''],['buyume','Büyüme',''],['peg','PEG',''],['borcOzkaynak','Borç/Özk',''],
-  ['roe','ROE',''],['piyasaDegeri','Piy.Değ (mlr)',''],['hacim','Hacim (mn/gün)',''],['kategori','Kategori','sol']];
+  ['fk','F/K',''],['buyume','Büyüme',''],['peg','PEG',''],['pd','PD/DD',''],['borcOzkaynak','Borç/Özk',''],
+  ['roe','ROE',''],['piyasaDegeri','Piy.Değ (mlr)',''],['hacim','Hacim (mn/gün)',''],
+  ['kategori','Kategori','sol'],['egilim','Eğilim','sol']];
 const HAZIR = { al:{fSinyal:'AL',fHacim:20}, lynch:{fPeg:1,fBorc:0.5,fBuyume:10},
                 ucuz:{fPeg:0.7,fFk:15}, saglam:{fBorc:0.3,fBuyume:0}, buyuk:{fPd:50}, tumu:{} };
 const ALANLAR = ['fAra','fSinyal','fKat','fPuan','fFk','fPeg','fBorc','fBuyume','fPd','fHacim'];
@@ -71,13 +72,14 @@ function ciz() {
         <td class="puan" style="color:${renk(h.puan)}">${h.puan>0?'+':''}${h.puan}</td>
         <td class="sol"><span class="rozet" style="color:${SINYAL_RENK[h.sinyal]??'var(--notr)'}">${esc(h.sinyal??'–')}</span></td>
         <td>${say(h.fk)}</td><td>${yuzde(h.buyume)}</td><td>${say(h.peg,2)}</td>
-        <td>${say(h.borcOzkaynak,2)}</td><td>${yuzde(h.roe)}</td><td>${mlr(h.piyasaDegeri)}</td>
+        <td>${say(h.pd,2)}</td><td>${say(h.borcOzkaynak,2)}</td><td>${yuzde(h.roe)}</td><td>${mlr(h.piyasaDegeri)}</td>
         <td${h.hacim!=null&&h.hacim<20e6?' style="color:var(--eksi)" title="düşük işlem hacmi"':''}>${h.hacim==null?'–':(h.hacim/1e6).toFixed(0)}</td>
-        <td class="sol kat">${esc(h.kategori)}</td></tr>${d}`;
+        <td class="sol kat">${esc(h.kategori)}</td>
+        <td class="sol kat" style="opacity:.85">${esc(h.egilim ?? '–')}</td></tr>${d}`;
     }).join('') + '</tbody>';
   $('#tablo').querySelectorAll('th[data-a]').forEach(th => th.onclick = () => {
     const a = th.dataset.a;
-    const ilkYon = !(KUCUK_IYI.has(a) || ['kod','kategori','sinyal'].includes(a));
+    const ilkYon = !(KUCUK_IYI.has(a) || ['kod','kategori','sinyal','egilim'].includes(a));
     sirala = { alan:a, ters: sirala.alan === a ? !sirala.ters : ilkYon }; ciz();
   });
   $('#tablo').querySelectorAll('tbody tr[data-kod]').forEach(tr => tr.onclick = e => {
@@ -101,8 +103,10 @@ async function canliGuncelle() {
     for (const h of liste) {
       const y = fm.get(h.kod);
       if (y == null || y <= 0) continue;
-      h.fiyat = y; h.piyasaDegeri = h.hisseAdedi * y; h.fk = h.piyasaDegeri / h.ttmKar;
-      h.peg = (h.tabanSaglam && h.buyume > 0) ? h.fk / h.buyume : null;
+      h.fiyat = y; h.piyasaDegeri = h.hisseAdedi * y;
+      h.fk = h.ttmKar > 0 ? h.piyasaDegeri / h.ttmKar : null;   // zararda F/K tanimsiz
+      h.peg = (h.tabanSaglam && h.buyume > 0 && h.fk != null) ? h.fk / h.buyume : null;
+      h.pd  = h.ozkaynak > 0 ? h.piyasaDegeri / h.ozkaynak : null;
       h.canli = true; n++;
     }
     ciz(); b.textContent = `${n} satır güncellendi`;
@@ -220,7 +224,8 @@ async function islem(tip) {
 }
 
 /* ═════════ SIMULASYON ═════════ */
-let simVeri = null, simSecili = '1 yıl', simOlcut = 'altin';
+let simVeri = null, simSecili = '1 yıl', simOlcut = 'altin', simLikit = true;
+const LIKIT_ESIK = 50e6;   // gunluk TL islem hacmi — altindakine gercekten girilemezdi
 const OLCUT_AD = { tufe:'TÜFE', dolar:'Dolar', altin:'Altın' };
 
 // Nominal getiriyi secilen olcute gore reel getiriye cevirir.
@@ -230,7 +235,8 @@ const reel = (nominal, olcut) =>
 
 function simCiz() {
   if (!simVeri) return;
-  const oz = simVeri.ozet.find(o => o.donem === simSecili);
+  const kaynak = simLikit && simVeri.ozetLikit ? simVeri.ozetLikit : simVeri.ozet;
+  const oz = kaynak.find(o => o.donem === simSecili);
   const olc = simVeri.olcutler[oz.gun] ?? {};
   const e = olc[simOlcut];
 
@@ -256,7 +262,19 @@ function simCiz() {
     (olc.tufe == null ? '<br><span style="opacity:.85">TÜFE için TCMB EVDS anahtarı gerekiyor; ' +
       'eklenirse resmi enflasyona göre de hesaplanır.</span>' : '') + '</div>' +
     '<div>Ortalama ile medyan farkı önemli: birkaç aşırı yükselen hisse ortalamayı şişirir. ' +
-    '<b>Medyan</b> tipik hisseyi gösterir, ortalamadan daha güvenilirdir.</div>';
+    '<b>Medyan</b> tipik hisseyi gösterir, ortalamadan daha güvenilirdir.</div>' +
+    (simLikit
+      ? '<div style="margin-top:6px;opacity:.85">Yalnızca o tarihte günde <b>50 mn TL üstü</b> işlem gören ' +
+        'hisseler sayılıyor. Bu filtre olmadan sonuçlar, o gün birkaç milyon TL işlem gören ' +
+        've gerçekte alınamayacak mikro hisselerin aşırı getirileriyle şişer.</div>'
+      : '<div style="margin-top:6px;color:var(--sari)">Filtresiz görünüm: listedeki bazı hisselere ' +
+        'o tarihte likidite yetersizliğinden <b>gerçekte girilemezdi</b>; getirileri kâğıt üzerindedir.</div>') +
+    (oz.gun >= 730
+      ? '<div style="margin-top:6px;color:var(--sari)"><b>' + simSecili + ' geriye bakıldığında hayatta kalma yanlılığı büyür:</b> ' +
+        'bu evren <b>bugün işlem gören</b> şirketlerden oluşuyor. O tarihte var olup sonradan ' +
+        'borsadan çıkan, birleşen ya da batan şirketler burada yok — yani tüm kovaların getirisi ' +
+        'gerçekte olduğundan iyimserdir.</div>'
+      : '');
 
   const g = $('#simAra').value.trim().toLocaleUpperCase('tr');
   const sin = $('#simSinyal').value, minPuan = parseFloat($('#simPuan').value);
@@ -267,6 +285,7 @@ function simCiz() {
     if (g && !(r.kod.includes(g) || (r.ad??'').toLocaleUpperCase('tr').includes(g))) return false;
     if (sin && r.sinyal !== sin) return false;
     if (!isNaN(minPuan) && r.puan < minPuan) return false;
+    if (simLikit && !(r.hacim >= LIKIT_ESIK)) return false;
     return true;
   }).sort((a,b) => b.getiri - a.getiri);
 
@@ -301,6 +320,14 @@ async function simYukle() {
     const varOlan = ['dolar','altin','tufe'].filter(k => simVeri.olcutler[365]?.[k] != null);
     $('#simOlcut').innerHTML = varOlan.map(k =>
       '<button data-o="' + k + '"' + (k===simOlcut?' class="aktif"':'') + '>' + OLCUT_AD[k] + '</button>').join('');
+    $('#simLikit').innerHTML =
+      '<button data-l="1"' + (simLikit ? ' class="aktif"' : '') + '>İşlem görebilir (≥50 mn/gün)</button>' +
+      '<button data-l="0"' + (simLikit ? '' : ' class="aktif"') + '>Tümü</button>';
+    $('#simLikit').querySelectorAll('button').forEach(b => b.onclick = () => {
+      simLikit = b.dataset.l === '1';
+      $('#simLikit').querySelectorAll('button').forEach(x => x.classList.toggle('aktif', x === b));
+      simCiz();
+    });
     $('#simOlcut').querySelectorAll('button').forEach(b => b.onclick = () => {
       simOlcut = b.dataset.o;
       $('#simOlcut').querySelectorAll('button').forEach(x => x.classList.toggle('aktif', x === b));
