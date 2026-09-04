@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIST · Lynch</title>
+<style>
+  :root{--bg:#f7f7f5;--kart:#fff;--metin:#1a1a1a;--soluk:#6b6b6b;--cizgi:#e3e3df;
+        --arti:#0f7b3f;--eksi:#c0392b;--notr:#8a8a8a;--vurgu:#1a4d8f;--secili:#eef3fa;--sari:#8a6d00}
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#141414;--kart:#1d1d1d;--metin:#e8e8e6;--soluk:#9a9a96;--cizgi:#2e2e2e;
+          --arti:#4ade80;--eksi:#f87171;--notr:#8a8a8a;--vurgu:#7aa7e0;--secili:#20293a;--sari:#e0b83a}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--metin);
+       font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  .sar{max-width:1180px;margin:0 auto;padding:20px 14px 60px}
+  header{display:flex;flex-wrap:wrap;align-items:baseline;gap:11px;margin-bottom:14px}
+  h1{font-size:21px;margin:0;letter-spacing:-.02em}
+  .ust-bilgi{color:var(--soluk);font-size:13px}
+  .kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:11px;padding:14px 16px;margin-bottom:16px}
+  h2{font-size:14px;margin:0 0 11px;font-weight:650}
+
+  .sekmeler{display:flex;gap:4px;border-bottom:1px solid var(--cizgi);margin-bottom:16px}
+  .sekmeler button{font:inherit;font-size:14px;font-weight:600;padding:9px 16px;border:none;
+                   background:none;color:var(--soluk);cursor:pointer;border-bottom:2px solid transparent}
+  .sekmeler button.aktif{color:var(--vurgu);border-bottom-color:var(--vurgu)}
+  .sayfa{display:none}.sayfa.aktif{display:block}
+
+  .fiyatlar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .fkart{background:var(--kart);border:1px solid var(--cizgi);border-radius:10px;padding:7px 12px;min-width:104px}
+  .fkod{font-weight:650;font-size:12.5px}
+
+  .hazir{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+  .hazir button,.dugme{font:inherit;font-size:13px;padding:6px 13px;border:1px solid var(--cizgi);
+                border-radius:20px;background:var(--bg);color:var(--metin);cursor:pointer}
+  .hazir button:hover,.dugme:hover{border-color:var(--vurgu)}
+  .hazir button.aktif{background:var(--vurgu);border-color:var(--vurgu);color:#fff}
+  .dugme.dolu{background:var(--vurgu);border-color:var(--vurgu);color:#fff}
+
+  .suzgec{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:9px}
+  .alan label{display:block;font-size:11.5px;color:var(--soluk);margin-bottom:3px}
+  input,select{width:100%;font:inherit;font-size:13.5px;padding:6px 9px;
+               border:1px solid var(--cizgi);border-radius:7px;background:var(--bg);color:var(--metin)}
+  .sayac{margin:12px 0 8px;font-size:13px;color:var(--soluk)}
+
+  .tablo-sar{overflow-x:auto;background:var(--kart);border:1px solid var(--cizgi);border-radius:11px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:860px}
+  th{text-align:right;padding:9px;color:var(--soluk);font-weight:600;font-size:11.5px;
+     border-bottom:1px solid var(--cizgi);white-space:nowrap;cursor:pointer;user-select:none;
+     position:sticky;top:0;background:var(--kart)}
+  th:hover{color:var(--vurgu)}
+  th:first-child,td:first-child,th.sol,td.sol{text-align:left}
+  td{padding:7px 9px;border-bottom:1px solid var(--cizgi);text-align:right;white-space:nowrap}
+  tbody tr[data-kod]{cursor:pointer}
+  tbody tr[data-kod]:hover{background:var(--secili)}
+  tr.acik{background:var(--secili)}
+  .kod{font-weight:650}.ad{color:var(--soluk);font-size:12px}
+  .puan{font-weight:700}.kat{color:var(--soluk);font-size:12.5px}
+  .detay td{background:var(--bg);font-size:13px;padding:11px 16px;text-align:left}
+  .detay ul{margin:0 0 8px;padding-left:18px}
+  .rozet{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:11px;border:1px solid currentColor}
+  .dipnot{color:var(--soluk);font-size:12px;margin-top:10px}
+  .bos{color:var(--soluk);padding:28px 0;text-align:center}
+
+  .ozet{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}
+  .ozet div{background:var(--bg);border:1px solid var(--cizgi);border-radius:9px;padding:9px 14px;min-width:132px}
+  .ozet .et{font-size:11.5px;color:var(--soluk)}
+  .ozet .dg{font-size:17px;font-weight:650}
+  .uyari{background:#fff3cd;color:#664d03;border:1px solid #ffe69c;padding:10px 13px;
+         border-radius:9px;margin-bottom:13px;font-size:13.5px}
+  @media (prefers-color-scheme:dark){.uyari{background:#3a3520;color:#f0dfa0;border-color:#5c5330}}
+  .kayit{border-bottom:1px solid var(--cizgi);padding:10px 0}
+  .kayit:last-child{border-bottom:none}
+  .yildiz{color:var(--sari);font-size:11px;letter-spacing:1px}
+  .saat{color:var(--soluk);font-size:12px;float:right}
+  a{color:var(--vurgu)}
+  @media (max-width:640px){
+    .sar{padding:14px 10px 50px}
+    h1{font-size:18px}
+    .suzgec{grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:7px}
+    .ozet div{min-width:calc(50% - 5px);flex:1}
+    .sekmeler button{padding:8px 11px;font-size:13px}
+    table{font-size:12.5px;min-width:700px}
+    th,td{padding:6px 7px}
+    .ad{display:none}          /* dar ekranda sirket adi yer kaplamasin */
+  }
+</style>
+</head>
+<body>
+<div class="sar">
+  <header><h1>BIST · Lynch</h1><span class="ust-bilgi" id="ustBilgi"></span></header>
+  <div class="fiyatlar" id="fiyatlar"></div>
+
+  <div class="sekmeler" id="sekmeler">
+    <button data-s="tarama" class="aktif">Tarama</button>
+    <button data-s="portfoy">Sanal portföy</button>
+    <button data-s="kap">KAP bildirimleri</button>
+  </div>
+
+  <!-- ============ TARAMA ============ -->
+  <div class="sayfa aktif" id="s-tarama">
+    <div class="kart">
+      <div class="hazir" id="hazir">
+        <button data-h="al">Lynch: AL sinyali</button>
+        <button data-h="lynch">Lynch kriterleri</button>
+        <button data-h="ucuz">Ucuz büyüyenler</button>
+        <button data-h="saglam">Borçsuz ve kârlı</button>
+        <button data-h="buyuk">Büyük şirketler</button>
+        <button data-h="tumu" class="aktif">Tümü</button>
+        <button id="bCanli" style="margin-left:auto">Canlı fiyatla güncelle</button>
+      </div>
+      <div class="suzgec">
+        <div class="alan"><label>Ara (kod / ad)</label><input id="fAra" placeholder="THYAO…"></div>
+        <div class="alan"><label>Sinyal</label><select id="fSinyal"><option value="">hepsi</option>
+          <option>AL</option><option>BEKLE</option><option>KAÇIN</option></select></div>
+        <div class="alan"><label>Kategori</label><select id="fKat"><option value="">hepsi</option></select></div>
+        <div class="alan"><label>En az puan</label><input id="fPuan" type="number" step="1"></div>
+        <div class="alan"><label>En çok F/K</label><input id="fFk" type="number" step="1"></div>
+        <div class="alan"><label>En çok PEG</label><input id="fPeg" type="number" step="0.1"></div>
+        <div class="alan"><label>En çok Borç/Özk</label><input id="fBorc" type="number" step="0.1"></div>
+        <div class="alan"><label>En az büyüme %</label><input id="fBuyume" type="number" step="5"></div>
+        <div class="alan"><label>En az piy.değeri (mlr)</label><input id="fPd" type="number" step="1"></div>
+        <div class="alan"><label>En az hacim (mn/gün)</label><input id="fHacim" type="number" step="10"></div>
+      </div>
+      <div class="sayac" id="sayac"></div>
+      <div class="tablo-sar"><table id="tablo"></table></div>
+      <div class="dipnot">Mali tablolar TMS-29 uyarınca enflasyona göre düzeltilmiştir; ancak yıllar karşılaştırılırken her yıl kendi dönem sonu parasıyla alındığından bir yıllık enflasyon farkı kalır — büyüme oranları o kadar yukarı yanlıdır. <b>Bankalar ve finans kuruluşları taramada yoktur</b> (farklı mali tablo formatı; borç/özkaynak ölçütü onlarda anlamsızdır). Kırmızı hacim = günde 20 mn TL altı, likidite riski. <b>•</b> işaretli satırlar canlı fiyatla güncellenmiştir.<b>•</b> işaretli satırlar canlı fiyatla güncellenmiştir. Satıra tıklayınca puan dökümü ve alım düğmesi açılır.</div>
+    </div>
+  </div>
+
+  <!-- ============ PORTFOY ============ -->
+  <div class="sayfa" id="s-portfoy">
+    <div class="kart">
+      <h2>Sanal portföy <span style="font-weight:400;color:var(--soluk)">— gerçek para yok, emir gönderilmez</span></h2>
+      <div class="ozet" id="pOzet"></div>
+      <div id="pUyari"></div>
+      <div class="suzgec" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr));margin-bottom:11px">
+        <div class="alan"><label>Hisse</label><input id="iKod" placeholder="THYAO"></div>
+        <div class="alan"><label>Adet</label><input id="iAdet" type="number" min="1" step="1" placeholder="100"></div>
+        <div class="alan"><label>&nbsp;</label><button class="dugme dolu" id="bAl" style="width:100%">Al</button></div>
+        <div class="alan"><label>&nbsp;</label><button class="dugme" id="bSat" style="width:100%">Sat</button></div>
+      </div>
+      <div class="tablo-sar"><table id="pTablo"></table></div>
+    </div>
+
+    <div class="kart">
+      <h2>Nöbetçi — sinyal değişince Telegram'dan haber ver</h2>
+      <div class="suzgec" style="grid-template-columns:1fr auto auto;gap:8px">
+        <div class="alan"><label>İzleme listesi (virgülle, en çok 15)</label><input id="iIzleme" placeholder="THYAO,TUPRS,ENKAI"></div>
+        <div class="alan"><label>&nbsp;</label><button class="dugme" id="bIzle">Kaydet</button></div>
+        <div class="alan"><label>&nbsp;</label><button class="dugme" id="bNobet">Şimdi kontrol et</button></div>
+      </div>
+      <div id="nobetSonuc" class="dipnot"></div>
+      <div class="dipnot">Portföyündeki hisseler otomatik izlenir. Kontrol seans içinde 30 dakikada bir kendiliğinden çalışır.</div>
+    </div>
+
+    <div class="kart"><h2>İşlem geçmişi</h2><div class="tablo-sar"><table id="pIslem"></table></div></div>
+  </div>
+
+  <!-- ============ KAP ============ -->
+  <div class="sayfa" id="s-kap">
+    <div class="kart">
+      <div class="suzgec" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:12px">
+        <div class="alan"><label>Aralık</label><select id="gunler">
+          <option value="1">Bugün</option><option value="2" selected>Son 2 gün</option>
+          <option value="3">Son 3 gün</option><option value="7">Son 7 gün</option></select></div>
+        <div class="alan"><label>Önem</label><select id="min">
+          <option value="5">Sadece kritik (5★)</option><option value="4" selected>Önemli+ (4★)</option>
+          <option value="3">Orta+ (3★)</option><option value="1">Hepsi</option></select></div>
+      </div>
+      <div id="bildirimler"><div class="bos">Yükleniyor…</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const TAKIP = ['XU100','THYAO','GARAN','ASELS','TUPRS'];
+const esc = t => String(t ?? '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+const say = (v,n=1) => v == null ? '–' : v.toFixed(n);
+const yuzde = v => v == null ? '–' : '%' + v.toFixed(0);
+const mlr = v => v == null ? '–' : (v/1e9).toFixed(1);
+const para = v => v == null ? '–' : v.toLocaleString('tr',{maximumFractionDigits:0});
+const renk = p => p > 0 ? 'var(--arti)' : p < 0 ? 'var(--eksi)' : 'var(--notr)';
+const SINYAL_RENK = { AL:'var(--arti)', BEKLE:'var(--sari)', 'KAÇIN':'var(--eksi)' };
+
+let hisseler = [], sirala = { alan:'puan', ters:true }, acikSatir = null;
+const KUCUK_IYI = new Set(['fk','peg','borcOzkaynak']);
+const SUTUN = [['kod','Hisse','sol'],['sinyal','Sinyal','sol'],['puan','Puan',''],['fk','F/K',''],
+  ['buyume','Büyüme',''],['peg','PEG',''],['borcOzkaynak','Borç/Özk',''],['roe','ROE',''],
+  ['piyasaDegeri','Piy.Değ (mlr)',''],['hacim','Hacim (mn/gün)',''],['kategori','Kategori','sol']];
+const HAZIR = { al:{fSinyal:'AL',fHacim:20}, lynch:{fPeg:1,fBorc:0.5,fBuyume:10}, ucuz:{fPeg:0.7,fFk:15},
+                saglam:{fBorc:0.3,fBuyume:0}, buyuk:{fPd:50}, tumu:{} };
+const ALANLAR = ['fAra','fSinyal','fKat','fPuan','fFk','fPeg','fBorc','fBuyume','fPd','fHacim'];
+
+// ---------- sekmeler ----------
+$('#sekmeler').querySelectorAll('button').forEach(b => b.onclick = () => {
+  $('#sekmeler').querySelectorAll('button').forEach(x => x.classList.toggle('aktif', x === b));
+  document.querySelectorAll('.sayfa').forEach(p => p.classList.toggle('aktif', p.id === 's-' + b.dataset.s));
+  if (b.dataset.s === 'portfoy') portfoyYukle();
+});
+
+// ---------- tarama ----------
+function suzulmus() {
+  const g = k => $('#'+k).value.trim();
+  const n = k => parseFloat($('#'+k).value);
+  const ara = g('fAra').toLocaleUpperCase('tr'), sin = g('fSinyal'), kat = g('fKat');
+  const [puan,fk,peg,borc,buy,pd,hac] = ['fPuan','fFk','fPeg','fBorc','fBuyume','fPd','fHacim'].map(n);
+  return hisseler.filter(h => {
+    if (ara && !(h.kod.includes(ara) || (h.ad??'').toLocaleUpperCase('tr').includes(ara))) return false;
+    if (sin && h.sinyal !== sin) return false;
+    if (kat && h.kategori !== kat) return false;
+    if (!isNaN(puan) && h.puan < puan) return false;
+    // olcute sinir konduysa, degeri OLMAYAN hisse elenir
+    if (!isNaN(fk)   && !(h.fk != null && h.fk <= fk)) return false;
+    if (!isNaN(peg)  && !(h.peg != null && h.peg <= peg)) return false;
+    if (!isNaN(borc) && !(h.borcOzkaynak != null && h.borcOzkaynak <= borc)) return false;
+    if (!isNaN(buy)  && !(h.buyume != null && h.buyume >= buy)) return false;
+    if (!isNaN(pd)   && !(h.piyasaDegeri != null && h.piyasaDegeri/1e9 >= pd)) return false;
+    if (!isNaN(hac)  && !(h.hacim != null && h.hacim/1e6 >= hac)) return false;
+    return true;
+  }).sort((a,b) => {
+    const x = a[sirala.alan], y = b[sirala.alan];
+    if (x == null && y == null) return 0;
+    if (x == null) return 1; if (y == null) return -1;
+    const k = typeof x === 'string' ? x.localeCompare(y,'tr') : x - y;
+    return sirala.ters ? -k : k;
+  });
+}
+
+function ciz() {
+  const liste = suzulmus();
+  $('#sayac').textContent = `${liste.length} hisse gösteriliyor (${hisseler.length} taranmış içinden)`;
+  if (!liste.length) { $('#tablo').innerHTML = '<tbody><tr><td class="bos">Ölçütlere uyan hisse yok.</td></tr></tbody>'; return; }
+  const ok = a => sirala.alan === a ? (sirala.ters ? ' ↓' : ' ↑') : '';
+  $('#tablo').innerHTML =
+    '<thead><tr>' + SUTUN.map(([a,ad,c]) => `<th class="${c}" data-a="${a}">${ad}${ok(a)}</th>`).join('') + '</tr></thead><tbody>' +
+    liste.map(h => {
+      const d = acikSatir === h.kod ? `<tr class="detay"><td colspan="${SUTUN.length}">
+        <ul>${h.kalemler.map(([n,ad,ac]) => `<li><b style="color:${renk(n)}">${n>0?'+'+n:n}</b> ${esc(ad)} — ${esc(ac)}</li>`).join('')}</ul>
+        <div>Dönem ${esc(h.donem)} · fiyat ${h.fiyat} TL
+          <button class="dugme dolu" style="margin-left:10px" onclick="hizliAl('${h.kod}')">Sanal portföye al</button></div></td></tr>` : '';
+      return `<tr class="${acikSatir===h.kod?'acik':''}" data-kod="${h.kod}">
+        <td class="sol"><span class="kod">${esc(h.kod)}</span><br><span class="ad">${esc((h.ad??'').slice(0,28))}</span></td>
+        <td class="sol"><span class="rozet" style="color:${SINYAL_RENK[h.sinyal]??'var(--notr)'}">${esc(h.sinyal??'–')}</span></td>
+        <td class="puan" style="color:${renk(h.puan)}">${h.puan>0?'+':''}${h.puan}</td>
+        <td${h.canli?' title="canlı fiyattan" style="font-weight:650"':''}>${say(h.fk)}${h.canli?' •':''}</td><td>${yuzde(h.buyume)}</td><td>${say(h.peg,2)}</td>
+        <td>${say(h.borcOzkaynak,2)}</td><td>${yuzde(h.roe)}</td><td>${mlr(h.piyasaDegeri)}</td><td${h.hacim!=null&&h.hacim<20e6?' style="color:var(--eksi)" title="düşük işlem hacmi"':''}>${h.hacim==null?'–':(h.hacim/1e6).toFixed(0)}</td>
+        <td class="sol kat">${esc(h.kategori)}</td></tr>${d}`;
+    }).join('') + '</tbody>';
+  $('#tablo').querySelectorAll('th').forEach(th => th.onclick = () => {
+    const a = th.dataset.a;
+    const ilkYon = !(KUCUK_IYI.has(a) || a === 'kod' || a === 'kategori' || a === 'sinyal');
+    sirala = { alan:a, ters: sirala.alan === a ? !sirala.ters : ilkYon };
+    ciz();
+  });
+  $('#tablo').querySelectorAll('tbody tr[data-kod]').forEach(tr => tr.onclick = e => {
+    if (e.target.tagName === 'BUTTON') return;
+    acikSatir = acikSatir === tr.dataset.kod ? null : tr.dataset.kod; ciz();
+  });
+}
+
+// Temel veri (net kar, hisse adedi) ceyreklik degisir; fiyat 15 dk gecikmeli canli.
+// Ikisini birlestirip F/K ve PEG'i anlik fiyata gore YENIDEN hesaplariz.
+async function canliGuncelle() {
+  const b = $('#bCanli');
+  const liste = suzulmus().slice(0, 36).filter(h => h.hisseAdedi && h.ttmKar > 0);
+  if (!liste.length) { b.textContent = 'güncellenecek satır yok'; return; }
+  b.disabled = true; b.textContent = 'güncelleniyor…';
+  try {
+    // /api/fiyat istek basina en cok 12 kod alir
+    const parcalar = [];
+    for (let i = 0; i < liste.length; i += 12) parcalar.push(liste.slice(i, i + 12));
+    const cevaplar = await Promise.all(parcalar.map(p =>
+      fetch(`/api/fiyat?kod=${p.map(x => x.kod).join(',')}`).then(r => r.json())));
+    const fiyatMap = new Map(cevaplar.flat().filter(f => !f.hata).map(f => [f.kod, f.fiyat]));
+
+    let n = 0;
+    for (const h of liste) {
+      const yeni = fiyatMap.get(h.kod);
+      if (yeni == null || yeni <= 0) continue;
+      h.fiyat = yeni;
+      h.piyasaDegeri = h.hisseAdedi * yeni;
+      h.fk = h.piyasaDegeri / h.ttmKar;
+      h.peg = (h.tabanSaglam && h.buyume > 0) ? h.fk / h.buyume : null;
+      h.canli = true;
+      n++;
+    }
+    ciz();
+    b.textContent = `${n} satır canlı fiyatla güncellendi`;
+  } catch { b.textContent = 'güncellenemedi'; }
+  finally { b.disabled = false; setTimeout(() => b.textContent = 'Canlı fiyatla güncelle', 4000); }
+}
+$('#bCanli').onclick = canliGuncelle;
+
+window.hizliAl = kod => {
+  $('#iKod').value = kod;
+  $('#sekmeler').querySelector('[data-s="portfoy"]').click();
+  $('#iAdet').focus();
+};
+
+function hazirUygula(ad) {
+  ALANLAR.forEach(k => $('#'+k).value = '');
+  for (const [k,v] of Object.entries(HAZIR[ad] ?? {})) $('#'+k).value = v;
+  $('#hazir').querySelectorAll('button[data-h]').forEach(b => b.classList.toggle('aktif', b.dataset.h === ad));
+  ciz();
+}
+
+async function taramaYukle() {
+  try {
+    const d = await (await fetch('/veri/tarama.json')).json();
+    hisseler = d.hisseler;
+    $('#ustBilgi').textContent = `${d.hisseler.length} hisse · tarama ${new Date(d.tarih).toLocaleString('tr')}`;
+    $('#fKat').innerHTML = '<option value="">hepsi</option>' +
+      [...new Set(hisseler.map(h => h.kategori))].sort().map(k => `<option>${esc(k)}</option>`).join('');
+    ciz();
+  } catch {
+    $('#tablo').innerHTML = '<tbody><tr><td class="bos">Tarama verisi yok. <code>./bist.mjs tarama</code> çalıştırın.</td></tr></tbody>';
+  }
+}
+
+// ---------- portfoy ----------
+function portfoyCiz(p) {
+  const k = p.karYuzde;
+  $('#pOzet').innerHTML = `
+    <div><div class="et">Toplam değer</div><div class="dg">${para(p.toplam)} ₺</div></div>
+    <div><div class="et">Kâr / zarar</div><div class="dg" style="color:${renk(p.kar)}">
+      ${p.kar>0?'+':''}${para(p.kar)} ₺<span style="font-size:13px"> (${k>0?'+':''}${k.toFixed(2)}%)</span></div></div>
+    <div><div class="et">Nakit</div><div class="dg">${para(p.nakit)} ₺</div></div>
+    <div><div class="et">Hisse değeri</div><div class="dg">${para(p.hisseDegeri)} ₺</div></div>
+    <div><div class="et">Gün</div><div class="dg">${p.gun}</div></div>
+    ${p.endeks ? `<div><div class="et">XU100 (aynı dönem)</div>
+      <div class="dg" style="color:${renk(p.endeks.getiriYuzde)}">${p.endeks.getiriYuzde>0?"+":""}${p.endeks.getiriYuzde.toFixed(2)}%</div></div>
+    <div><div class="et">Endekse göre</div>
+      <div class="dg" style="color:${renk(k-p.endeks.getiriYuzde)}">${(k-p.endeks.getiriYuzde)>0?"+":""}${(k-p.endeks.getiriYuzde).toFixed(2)} puan</div></div>` : ""}`;
+
+  $('#pTablo').innerHTML = p.pozisyonlar.length
+    ? '<thead><tr><th class="sol">Hisse</th><th>Adet</th><th>Ort.maliyet</th><th>Fiyat</th><th>Günlük</th><th>Değer</th><th>K/Z</th><th>K/Z %</th></tr></thead><tbody>' +
+      p.pozisyonlar.map(s => `<tr><td class="sol kod">${esc(s.kod)}</td><td>${s.adet}</td>
+        <td>${say(s.ortMaliyet,2)}</td><td>${say(s.fiyat,2)}</td>
+        <td style="color:${renk(s.gunlukDegisim)}">${s.gunlukDegisim==null?'–':(s.gunlukDegisim>0?'+':'')+s.gunlukDegisim.toFixed(2)+'%'}</td>
+        <td>${para(s.deger)}</td>
+        <td style="color:${renk(s.kar)}">${s.kar==null?'–':(s.kar>0?'+':'')+para(s.kar)}</td>
+        <td style="color:${renk(s.kar)}">${s.karYuzde==null?'–':(s.karYuzde>0?'+':'')+s.karYuzde.toFixed(1)+'%'}</td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td class="bos">Henüz pozisyon yok. Yukarıdan hisse alabilirsin.</td></tr></tbody>';
+
+  $('#pIslem').innerHTML = p.islemler.length
+    ? '<thead><tr><th class="sol">Tarih</th><th class="sol">İşlem</th><th class="sol">Hisse</th><th>Adet</th><th>Fiyat</th><th>Tutar</th><th>K/Z</th></tr></thead><tbody>' +
+      p.islemler.map(i => `<tr><td class="sol">${new Date(i.tarih).toLocaleString('tr')}</td>
+        <td class="sol" style="color:${i.tip==='AL'?'var(--vurgu)':'var(--sari)'};font-weight:650">${i.tip}</td>
+        <td class="sol kod">${esc(i.kod)}</td><td>${i.adet}</td><td>${say(i.fiyat,2)}</td><td>${para(i.tutar)}</td>
+        <td style="color:${renk(i.kar)}">${i.kar==null?'–':(i.kar>0?'+':'')+para(i.kar)}</td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td class="bos">İşlem yok.</td></tr></tbody>';
+
+  if (p.izleme) $('#iIzleme').value = p.izleme.join(',');
+}
+
+async function portfoyYukle() {
+  try { portfoyCiz(await (await fetch('/api/portfoy')).json()); }
+  catch { $('#pUyari').innerHTML = '<div class="uyari">Portföy okunamadı.</div>'; }
+}
+
+async function islem(tip) {
+  const kod = $('#iKod').value.trim().toUpperCase(), adet = $('#iAdet').value;
+  if (!kod || !adet) { $('#pUyari').innerHTML = '<div class="uyari">Hisse kodu ve adet gerekli.</div>'; return; }
+  $('#pUyari').innerHTML = '';
+  const r = await fetch('/api/portfoy', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ islem:tip, kod, adet:Number(adet) }) });
+  const d = await r.json();
+  if (d.hata) { $('#pUyari').innerHTML = `<div class="uyari">${esc(d.hata)}</div>`; return; }
+  $('#iAdet').value = '';
+  portfoyCiz(d);
+}
+
+$('#bAl').onclick = () => islem('al');
+$('#bSat').onclick = () => islem('sat');
+$('#bIzle').onclick = async () => {
+  const kodlar = $('#iIzleme').value.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+  const d = await (await fetch('/api/portfoy',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({islem:'izle',kodlar})})).json();
+  $('#nobetSonuc').textContent = `İzleme listesi kaydedildi: ${(d.izleme??[]).join(', ') || '(boş)'}`;
+};
+$('#bNobet').onclick = async () => {
+  $('#nobetSonuc').textContent = 'kontrol ediliyor…';
+  try {
+    const d = await (await fetch('/api/nobet')).json();
+    $('#nobetSonuc').textContent =
+      `${d.izlenen} hisse kontrol edildi · ${d.degisen} sinyal değişikliği` +
+      (d.degisen ? ' → ' + d.degisenler.map(x => `${x.kod} ${x.eski}→${x.yeni}`).join(', ') : '') +
+      ` · Telegram: ${d.telegram.gonderildi ? 'gönderildi' : d.telegram.sebep}`;
+  } catch { $('#nobetSonuc').textContent = 'kontrol başarısız'; }
+};
+
+// ---------- fiyat + KAP ----------
+async function fiyatlariYukle() {
+  try {
+    const r = await (await fetch(`/api/fiyat?kod=${TAKIP.join(',')}`)).json();
+    $('#fiyatlar').innerHTML = r.filter(f => !f.hata).map(f => {
+      const d = f.degisimYuzde ?? 0;
+      return `<div class="fkart"><div class="fkod">${esc(f.kod)}</div><div>${f.fiyat?.toLocaleString('tr')}</div>
+        <div style="font-size:12px;color:${d>=0?'var(--arti)':'var(--eksi)'}">${d>=0?'+':''}${d.toFixed(2)}%</div></div>`;
+    }).join('');
+  } catch {}
+}
+
+async function bildirimleriYukle() {
+  $('#bildirimler').innerHTML = '<div class="bos">Yükleniyor…</div>';
+  try {
+    const d = await (await fetch(`/api/bildirimler?gunler=${$('#gunler').value}&min=${$('#min').value}`)).json();
+    $('#bildirimler').innerHTML = d.kayitlar.length ? d.kayitlar.map(k => `<div class="kayit">
+      <span class="yildiz">${'★'.repeat(k.onem)}</span> <b>${esc(k.etiket)}</b>
+      <span class="saat">${esc(k.tarih)}</span>
+      <div style="font-size:13.5px">${esc(k.baslik)}</div>
+      <div style="font-size:12px;margin-top:4px"><a href="${k.url}" target="_blank" rel="noopener">KAP'ta aç</a></div>
+    </div>`).join('') : '<div class="bos">Bu aralıkta bildirim yok.</div>';
+  } catch { $('#bildirimler').innerHTML = '<div class="bos">Bildirimler alınamadı.</div>'; }
+}
+
+$('#hazir').querySelectorAll('button[data-h]').forEach(b => b.onclick = () => hazirUygula(b.dataset.h));
+ALANLAR.forEach(k => $('#'+k).oninput = ciz);
+$('#gunler').onchange = bildirimleriYukle;
+$('#min').onchange = bildirimleriYukle;
+
+taramaYukle(); fiyatlariYukle(); bildirimleriYukle();
+</script>
+</body>
+</html>

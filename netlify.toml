@@ -1,0 +1,15 @@
+[build]
+  publish = "public"
+  # Her dagitimda tarama yenilenir (~1 dk, ~1400 dis istek).
+  # Basarisiz olursa dagitim durmaz; onceki tarama.json yayinlanir.
+  command = "node bist.mjs tarama --es 10 || echo 'tarama basarisiz — mevcut veri kullanilacak'"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Netlify panelinden tanimlanacak ortam degiskenleri (repoya YAZILMAZ):
+#   NVIDIA_API_KEY      KAP bildirimlerini LLM ile okumak icin
+#   TELEGRAM_BOT_TOKEN  nobetci bildirimleri
+#   TELEGRAM_CHAT_ID    nobetci bildirimleri
+#   BUILD_HOOK_URL      gunluk otomatik tarama yenilemesi icin derleme kancasi
